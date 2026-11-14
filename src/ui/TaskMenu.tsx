@@ -78,20 +78,20 @@ export const TaskMenu: React.FC = () => {
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 select-none pointer-events-auto"
+      className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 select-none pointer-events-auto"
       onClick={closeMenu}
     >
       <div
-        className="bg-slate-900 border-2 border-slate-700 rounded-2xl max-w-lg w-full p-5 shadow-2xl text-slate-200 animate-fadeIn"
+        className="bg-[#080F1B] border border-[#26374D] rounded-2xl max-w-lg w-full p-5 shadow-2xl text-[#F1F5F9] animate-fadeIn"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+        <div className="flex items-center justify-between border-b border-[#26374D] pb-3 mb-4">
           <div>
-            <h2 className="text-lg font-black text-white capitalize flex items-center gap-2">
+            <h2 className="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
               <span>🛠️</span> {buildingId.replace('_', ' ')} Operations
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-[#94A3B8]">
               Select an astronaut and assign a mission task. Review resource costs below.
             </p>
           </div>
@@ -100,7 +100,7 @@ export const TaskMenu: React.FC = () => {
               e.stopPropagation();
               closeMenu();
             }}
-            className="w-9 h-9 flex items-center justify-center rounded-xl bg-slate-800 hover:bg-red-600 text-slate-300 hover:text-white font-bold text-lg transition-all cursor-pointer shadow-lg active:scale-95 border border-slate-700 hover:border-red-500"
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#152235] hover:bg-[#EF4444] text-[#94A3B8] hover:text-white font-bold text-base transition-all cursor-pointer border border-[#26374D] hover:border-[#EF4444]"
             title="Close Menu (Esc)"
             aria-label="Close Operations Menu"
           >
@@ -110,7 +110,7 @@ export const TaskMenu: React.FC = () => {
 
         {/* Astronaut Selector */}
         <div className="mb-4">
-          <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
+          <label className="text-[10px] font-bold uppercase tracking-wider text-[#94A3B8] block mb-1.5">
             Assign Astronaut:
           </label>
           <div className="grid grid-cols-4 gap-2">
@@ -122,12 +122,12 @@ export const TaskMenu: React.FC = () => {
 
               const roleBadgeColor =
                 cid === 'alex'
-                  ? 'text-cyan-400 bg-cyan-950/50 border-cyan-800/80'
+                  ? 'text-[#25C5F4] bg-[#25C5F4]/10 border-[#25C5F4]/40'
                   : cid === 'sara'
-                  ? 'text-emerald-400 bg-emerald-950/50 border-emerald-800/80'
+                  ? 'text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/40'
                   : cid === 'daniel'
-                  ? 'text-amber-400 bg-amber-950/50 border-amber-800/80'
-                  : 'text-pink-400 bg-pink-950/50 border-pink-800/80';
+                  ? 'text-[#F59E0B] bg-[#F59E0B]/10 border-[#F59E0B]/40'
+                  : 'text-pink-400 bg-pink-950/30 border-pink-800/60';
 
               return (
                 <button
@@ -140,12 +140,12 @@ export const TaskMenu: React.FC = () => {
                   }}
                   className={`p-2 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center ${
                     isSel
-                      ? 'bg-sky-950/90 border-sky-400 ring-2 ring-sky-400 text-white shadow-lg shadow-sky-500/20'
-                      : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:border-slate-700 hover:bg-slate-900'
+                      ? 'bg-[#152235] border-[#25C5F4] ring-1 ring-[#25C5F4] text-white shadow-md'
+                      : 'bg-[#101A29] border-[#26374D] text-[#94A3B8] hover:border-[#25C5F4]/40 hover:bg-[#152235]'
                   }`}
                 >
                   <div className="w-full">
-                    <div className="text-xs font-black text-white flex items-center justify-center gap-1">
+                    <div className="text-xs font-bold text-white flex items-center justify-center gap-1">
                       <span>{info.shortName}</span>
                       {isEngineer && <span title="Systems Engineer (Fast Repairs)">⚡</span>}
                     </div>
@@ -153,16 +153,16 @@ export const TaskMenu: React.FC = () => {
                       {info.roleShort}
                     </div>
                   </div>
-                  <div className="text-[10px] text-slate-300 font-mono mt-1.5 px-1 py-0.5 rounded bg-slate-900 border border-slate-800 w-full text-center">
+                  <div className="text-[10px] text-[#94A3B8] font-mono mt-1.5 px-1 py-0.5 rounded bg-[#080F1B] border border-[#26374D] w-full text-center">
                     {c.stamina}h stamina
                   </div>
                 </button>
               );
             })}
           </div>
-          <div className="text-[11px] text-slate-400 mt-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800">
+          <div className="text-[11px] text-[#94A3B8] mt-2 p-2 rounded-lg bg-[#101A29] border border-[#26374D]">
             Perk: <strong className="text-white">{crewMember.name}</strong> ({crewMember.role}) —{' '}
-            <strong className="text-sky-300">{crewMember.perk}</strong>
+            <strong className="text-[#25C5F4]">{crewMember.perk}</strong>
           </div>
         </div>
 
@@ -497,16 +497,16 @@ export const TaskMenu: React.FC = () => {
         </div>
 
         {/* Footer Dismiss Button */}
-        <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-          <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-            <span>💡</span> Press <kbd className="px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-sky-300 font-mono text-[10px]">ESC</kbd> or click ✕ to close
+        <div className="mt-4 pt-3 border-t border-[#26374D] flex items-center justify-between">
+          <div className="text-[11px] text-[#94A3B8] flex items-center gap-1.5 font-mono">
+            <span>💡</span> Press <kbd className="px-1.5 py-0.5 rounded bg-[#101A29] border border-[#26374D] text-[#25C5F4] text-[10px]">ESC</kbd> or click ✕ to close
           </div>
           <button
             onClick={(e) => {
               e.stopPropagation();
               closeMenu();
             }}
-            className="px-4 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold transition-all cursor-pointer border border-slate-700 active:scale-95"
+            className="px-4 py-1.5 rounded-lg bg-[#152235] hover:bg-[#26374D] text-[#F1F5F9] text-xs font-bold transition-all cursor-pointer border border-[#26374D]"
           >
             Close Menu
           </button>

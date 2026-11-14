@@ -13,11 +13,13 @@ export type QualitySetting = 'low' | 'medium' | 'high';
 export type DetailLevel = 'explorer' | 'engineer' | 'classroom';
 export type ActiveNavTab =
   | 'overview'
-  | 'buildings'
-  | 'construction'
   | 'astronauts'
-  | 'rover'
+  | 'buildings'
+  | 'operations'
   | 'research'
+  | 'rover'
+  | 'construction'
+  | 'inventory'
   | 'objectives'
   | 'achievements'
   | 'stats'
@@ -39,6 +41,7 @@ export type ActiveModal =
 export type SelectedEntity =
   | { type: 'building'; id: BuildingId }
   | { type: 'crew'; id: CrewId }
+  | { type: 'resource'; id: 'battery' | 'oxygen' | 'water' | 'food' | 'health' | 'radiation' | 'comms' }
   | { type: 'rover' }
   | null;
 

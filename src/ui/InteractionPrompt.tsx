@@ -1,7 +1,8 @@
 /**
  * LUNAR FRONTIER: THE LAST 30 DAYS
  * src/ui/InteractionPrompt.tsx
- * Floating interaction prompt displayed when the player approaches within interaction radius of a base building.
+ * Subtle, Professional Proximity Interaction Prompt [E].
+ * Displays when astronaut approaches an operational base module.
  */
 
 import React from 'react';
@@ -40,31 +41,19 @@ export const InteractionPrompt: React.FC = () => {
   };
 
   return (
-    <div className="absolute bottom-28 left-1/2 -translate-x-1/2 z-30 pointer-events-auto select-none animate-fadeIn">
+    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 pointer-events-auto select-none animate-fadeIn">
       <button
         onClick={handleInteract}
-        className="flex items-center gap-3 px-5 py-2.5 rounded-2xl bg-[#080E19]/95 border-2 border-[#36C5F0] hover:border-white shadow-2xl backdrop-blur-xl transition-all hover:scale-105 cursor-pointer text-left group"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#080F1B]/95 border border-[#25C5F4] hover:border-white shadow-xl backdrop-blur-md transition-all hover:scale-105 cursor-pointer text-left group"
       >
-        <span className="text-2xl group-hover:scale-110 transition-transform">
-          {info.icon}
-        </span>
-
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-black uppercase tracking-wider text-white">
-              {info.name}
-            </span>
-            <span className="px-1.5 py-0.5 rounded bg-[#36C5F0] text-[#080E19] text-[10px] font-black font-mono shadow-sm">
-              [ E ]
-            </span>
-          </div>
-          <div className="text-[10px] text-[#A7B4C8] font-medium mt-0.5">
-            {info.action}
-          </div>
-        </div>
-
-        <div className="ml-2 text-xs font-black text-[#36C5F0] uppercase tracking-wider group-hover:translate-x-1 transition-transform">
-          OPERATE ➔
+        <span className="text-base leading-none">{info.icon}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs font-bold text-white uppercase tracking-wider">
+            {info.name}
+          </span>
+          <span className="px-1.5 py-0.5 rounded bg-[#25C5F4] text-[#080F1B] text-[10px] font-mono font-black shadow-sm">
+            [E]
+          </span>
         </div>
       </button>
     </div>

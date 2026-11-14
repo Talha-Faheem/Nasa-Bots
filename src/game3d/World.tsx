@@ -71,7 +71,7 @@ const EarthInSky: React.FC = () => {
 
 export const World: React.FC = () => {
   return (
-    <div className="w-full h-full absolute inset-0 bg-black">
+    <div className="w-full h-full absolute inset-0 bg-black z-0 isolate">
       <Canvas
         shadows
         gl={{ antialias: true, alpha: false }}

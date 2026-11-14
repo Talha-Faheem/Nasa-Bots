@@ -1,7 +1,8 @@
 /**
  * LUNAR FRONTIER: THE LAST 30 DAYS
  * src/ui/MissionBar.tsx
- * Top Mission Control bar: Mission Day, Lunar Time, Speeds, Save/Load, Manual, NASA Data, Settings.
+ * Professional NASA-inspired Mission Control Top Bar (Area A).
+ * Compact, unified layout with Mission Identification, Timeline, Simulation Speed, and Utility Actions.
  */
 
 import React from 'react';
@@ -17,164 +18,138 @@ export const MissionBar: React.FC = () => {
   const progressPercent = Math.min(100, Math.round(((mission.day - 1 + mission.tick / 24) / 30) * 100));
 
   return (
-    <header className="flex flex-wrap items-center justify-between gap-3 bg-[#080E19]/90 border-b border-[#293A50] px-4 py-2.5 backdrop-blur-md shadow-2xl select-none z-30">
-      {/* Brand & Mission Status */}
+    <header className="h-12 bg-[#080F1B]/95 border-b border-[#26374D] px-4 flex items-center justify-between select-none z-30 backdrop-blur-md shadow-lg pointer-events-auto">
+      {/* Left: Brand, Location & Mission ID */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#36C5F0] to-[#111C2D] flex items-center justify-center shadow-lg border border-[#36C5F0]/40">
-            <span className="text-base font-black text-white">LF</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-md bg-[#101A29] border border-[#25C5F4]/40 flex items-center justify-center shadow-[0_0_8px_rgba(37,197,244,0.15)]">
+            <span className="text-xs font-black text-[#25C5F4] tracking-tight">LF</span>
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-black tracking-widest text-[#F4F7FC] uppercase">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-1.5 leading-none">
+              <span className="text-xs font-black tracking-wider text-[#F1F5F9] uppercase">
                 Lunar Frontier
               </span>
-              <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#36C5F0]/20 text-[#36C5F0] border border-[#36C5F0]/40 uppercase">
-                {mission.siteId === 'mars' ? 'Mars Sol' : 'South Pole Base'}
+              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-[#101A29] text-[#25C5F4] border border-[#25C5F4]/30 uppercase font-semibold">
+                EXP-30
               </span>
             </div>
-            <div className="text-[10px] text-[#A7B4C8] font-mono">
-              NASA Mission Simulator • 30-Day Expedition
-            </div>
+            <span className="text-[10px] text-[#94A3B8] font-mono mt-0.5 leading-none">
+              Lunar South Pole • Shackleton Rim
+            </span>
           </div>
         </div>
 
-        <div className="h-7 w-px bg-[#293A50] hidden sm:block mx-1" />
+        <div className="h-5 w-px bg-[#26374D] hidden md:block mx-1" />
 
-        {/* Mission Day Counter & Lunar Clock */}
-        <div className="flex items-center gap-2 bg-[#111C2D] border border-[#293A50] rounded-xl px-3 py-1">
-          <div className="flex flex-col">
-            <span className="text-[9px] uppercase tracking-wider font-bold text-[#36C5F0]">
-              Mission Timeline
-            </span>
-            <div className="flex items-baseline gap-1">
-              <span className="text-base font-black text-[#F4F7FC]">
-                DAY {mission.day}
-              </span>
-              <span className="text-xs text-[#A7B4C8] font-mono">/ 30</span>
+        {/* Center-Left: Mission Timeline & Clock */}
+        <div className="hidden sm:flex items-center gap-2.5 bg-[#101A29] border border-[#26374D] rounded-lg px-2.5 py-1">
+          <div className="flex items-baseline gap-1">
+            <span className="text-[10px] uppercase font-bold text-[#25C5F4] tracking-wider">DAY</span>
+            <span className="text-xs font-black font-mono text-[#F1F5F9]">{mission.day}</span>
+            <span className="text-[10px] font-mono text-[#94A3B8]">/ 30</span>
+          </div>
+          <div className="h-3.5 w-px bg-[#26374D]" />
+          <div className="flex items-center gap-1 font-mono text-xs">
+            <span className="text-[#F1F5F9] font-semibold">{String(mission.tick).padStart(2, '0')}:00</span>
+            <span className="text-[9px] text-[#94A3B8]">LT</span>
+          </div>
+          <div className="h-3.5 w-px bg-[#26374D]" />
+          {/* Subtle Progress Bar */}
+          <div className="flex items-center gap-1.5 w-20">
+            <div className="flex-1 h-1 bg-[#152235] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[#25C5F4] transition-all duration-300"
+                style={{ width: `${progressPercent}%` }}
+              />
             </div>
-          </div>
-          <div className="h-6 w-px bg-[#293A50]" />
-          <div className="flex flex-col font-mono text-[11px] text-[#A7B4C8]">
-            <span className="text-[#F4F7FC] font-bold">
-              {String(mission.tick).padStart(2, '0')}:00 LT
-            </span>
-            <span className="text-[9px]">Tick {mission.totalTicks}</span>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="hidden md:flex flex-col w-28">
-          <div className="flex justify-between text-[9px] text-[#A7B4C8] font-mono mb-0.5">
-            <span>Progress</span>
-            <span>{progressPercent}%</span>
-          </div>
-          <div className="w-full h-1.5 bg-[#111C2D] rounded-full border border-[#293A50] overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-[#36C5F0] to-[#37D67A] rounded-full transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
-            />
+            <span className="text-[9px] font-mono text-[#94A3B8]">{progressPercent}%</span>
           </div>
         </div>
       </div>
 
-      {/* Speed & Pause Controls */}
-      <div className="flex items-center gap-1.5 bg-[#111C2D] p-1 rounded-xl border border-[#293A50]">
-        <button
-          onClick={() => dispatch(mission.isPaused ? { type: 'RESUME' } : { type: 'PAUSE' })}
-          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-            mission.isPaused
-              ? 'bg-[#F5B942] text-[#080E19] shadow-lg animate-pulse'
-              : 'bg-[#17263A] text-[#F4F7FC] hover:bg-[#293A50]'
-          }`}
-          title="Pause / Resume Clock (Spacebar)"
-        >
-          <span>{mission.isPaused ? '▶' : '⏸'}</span>
-          <span>{mission.isPaused ? 'RESUME' : 'PAUSE'}</span>
-        </button>
+      {/* Center-Right: Simulation Controls (Speed & Pause) */}
+      <div className="flex items-center gap-2">
+        <div className="flex items-center bg-[#101A29] p-0.5 rounded-lg border border-[#26374D]">
+          <button
+            onClick={() => dispatch(mission.isPaused ? { type: 'RESUME' } : { type: 'PAUSE' })}
+            className={`px-2.5 py-1 rounded text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+              mission.isPaused
+                ? 'bg-[#F59E0B] text-[#080F1B] shadow font-black'
+                : 'bg-[#152235] text-[#F1F5F9] hover:bg-[#26374D]'
+            }`}
+            title="Pause / Resume Clock (Spacebar)"
+          >
+            <span>{mission.isPaused ? '▶' : '⏸'}</span>
+            <span className="text-[10px] tracking-wider">{mission.isPaused ? 'RESUME' : 'PAUSE'}</span>
+          </button>
 
-        <button
-          onClick={() => dispatch({ type: 'SET_SPEED', speed: 1 })}
-          className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
-            !mission.isPaused && mission.speed === 1
-              ? 'bg-[#36C5F0] text-[#080E19] shadow-md'
-              : 'bg-[#17263A] text-[#A7B4C8] hover:bg-[#293A50]'
-          }`}
-          title="Normal Speed (1x)"
-        >
-          1×
-        </button>
-        <button
-          onClick={() => dispatch({ type: 'SET_SPEED', speed: 2 })}
-          className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
-            !mission.isPaused && mission.speed === 2
-              ? 'bg-[#36C5F0] text-[#080E19] shadow-md'
-              : 'bg-[#17263A] text-[#A7B4C8] hover:bg-[#293A50]'
-          }`}
-          title="Fast Speed (2x)"
-        >
-          2×
-        </button>
-        <button
-          onClick={() => dispatch({ type: 'SET_SPEED', speed: 4 })}
-          className={`px-2.5 py-1 rounded-lg text-xs font-bold font-mono transition-all cursor-pointer ${
-            !mission.isPaused && mission.speed === 4
-              ? 'bg-[#36C5F0] text-[#080E19] shadow-md'
-              : 'bg-[#17263A] text-[#A7B4C8] hover:bg-[#293A50]'
-          }`}
-          title="Ultra Speed (4x)"
-        >
-          4×
-        </button>
-      </div>
+          <div className="h-4 w-px bg-[#26374D] mx-0.5" />
 
-      {/* Action / Help / Documentation Buttons */}
-      <div className="flex items-center gap-1.5">
-        <button
-          onClick={() => setTutorialStep(0)}
-          className="px-2.5 py-1.5 rounded-lg bg-[#111C2D] border border-[#293A50] hover:border-[#36C5F0] text-[#A7B4C8] hover:text-[#36C5F0] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-          title="Interactive Mission Tutorial"
-        >
-          <span>🎓</span>
-          <span className="hidden lg:inline">Tutorial</span>
-        </button>
+          {( [1, 2, 4] as const ).map((s) => {
+            const isCur = !mission.isPaused && mission.speed === s;
+            return (
+              <button
+                key={s}
+                onClick={() => dispatch({ type: 'SET_SPEED', speed: s })}
+                className={`px-2 py-1 rounded text-[11px] font-bold font-mono transition-all cursor-pointer ${
+                  isCur
+                    ? 'bg-[#25C5F4] text-[#080F1B] font-black'
+                    : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152235]'
+                }`}
+                title={`Simulation Speed ${s}x`}
+              >
+                {s}×
+              </button>
+            );
+          })}
+        </div>
 
-        <button
-          onClick={() => setModal('manual')}
-          className="px-2.5 py-1.5 rounded-lg bg-[#17263A] border border-[#36C5F0]/60 text-[#36C5F0] hover:bg-[#36C5F0] hover:text-[#080E19] text-xs font-black transition-all flex items-center gap-1.5 shadow-md cursor-pointer"
-          title="Open In-Game Player Manual & STEM Guide"
-        >
-          <span>📖</span>
-          <span>MANUAL</span>
-        </button>
+        <div className="h-5 w-px bg-[#26374D] hidden md:block mx-1" />
 
-        <button
-          onClick={() => setModal('save_load')}
-          className="px-2.5 py-1.5 rounded-lg bg-[#111C2D] border border-[#293A50] hover:border-[#36C5F0] text-[#A7B4C8] hover:text-[#F4F7FC] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-          title="Save or Load Mission Progress"
-        >
-          <span>💾</span>
-          <span className="hidden sm:inline">Save/Load</span>
-        </button>
+        {/* Right: Utility & Documentation Navigation */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setTutorialStep(0)}
+            className="px-2 py-1 rounded-md bg-[#101A29] border border-[#26374D] hover:border-[#25C5F4] text-[#94A3B8] hover:text-[#25C5F4] text-[11px] font-semibold transition-colors cursor-pointer"
+            title="Interactive Tutorial"
+          >
+            Tutorial
+          </button>
 
-        <button
-          onClick={() => setModal('datasources')}
-          className="px-2.5 py-1.5 rounded-lg bg-[#111C2D] border border-[#293A50] hover:border-[#36C5F0] text-[#A7B4C8] hover:text-[#F4F7FC] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
-          title="NASA Open Data Information"
-        >
-          <span>🛰️</span>
-          <span className="hidden xl:inline">NASA Data</span>
-        </button>
+          <button
+            onClick={() => setModal('manual')}
+            className="px-2.5 py-1 rounded-md bg-[#152235] border border-[#25C5F4]/40 text-[#25C5F4] hover:bg-[#25C5F4] hover:text-[#080F1B] text-[11px] font-bold transition-all shadow-sm cursor-pointer"
+            title="Player Manual & Scientific Mission Handbook"
+          >
+            Manual
+          </button>
 
-        <button
-          onClick={() => setModal('settings')}
-          className="p-1.5 rounded-lg bg-[#111C2D] border border-[#293A50] hover:border-[#36C5F0] text-[#A7B4C8] hover:text-[#F4F7FC] text-xs font-bold transition-all cursor-pointer"
-          title="Graphics and Sound Settings"
-        >
-          ⚙️
-        </button>
+          <button
+            onClick={() => setModal('save_load')}
+            className="px-2 py-1 rounded-md bg-[#101A29] border border-[#26374D] hover:border-[#25C5F4] text-[#94A3B8] hover:text-[#F1F5F9] text-[11px] font-semibold transition-colors cursor-pointer"
+            title="Save / Load Game"
+          >
+            Save/Load
+          </button>
+
+          <button
+            onClick={() => setModal('datasources')}
+            className="px-2 py-1 rounded-md bg-[#101A29] border border-[#26374D] hover:border-[#25C5F4] text-[#94A3B8] hover:text-[#F1F5F9] text-[11px] font-semibold transition-colors cursor-pointer"
+            title="NASA DONKI & OSDR Open Data Attribution"
+          >
+            NASA Data
+          </button>
+
+          <button
+            onClick={() => setModal('settings')}
+            className="w-7 h-7 rounded-md bg-[#101A29] border border-[#26374D] hover:border-[#25C5F4] text-[#94A3B8] hover:text-[#F1F5F9] flex items-center justify-center text-xs transition-colors cursor-pointer"
+            title="Mission Settings & Preferences"
+          >
+            ⚙️
+          </button>
+        </div>
       </div>
     </header>
   );
 };
-

@@ -9,7 +9,7 @@ import { useFrame } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { BuildingId } from '../../sim/types.ts';
-import { BUILDING_COORDINATES, getCrewDisplayName } from '../../sim/rules/crew.ts';
+import { BUILDING_COORDINATES } from '../../sim/rules/crew.ts';
 import { useGameStore } from '../../store/store.ts';
 import { eventBus } from '../../store/bus.ts';
 
@@ -25,6 +25,7 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
   const setSelectedEntity = useGameStore((s) => s.setSelectedEntity);
   const activeModal = useGameStore((s) => s.activeModal);
   const selectedEntity = useGameStore((s) => s.selectedEntity);
+  const activeNavTab = useGameStore((s) => s.activeNavTab);
 
   const state = useGameStore((s) => s.state);
   const coords = BUILDING_COORDINATES[id];
@@ -73,20 +74,14 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
   }
 
   let statusColor = '#22c55e'; // Green
-  let statusText = 'Optimal';
   if (isFaulted || condition < 25) {
     statusColor = '#ef4444'; // Red
-    statusText = 'Fault / Offline';
   } else if (condition < 50) {
     statusColor = '#eab308'; // Yellow
-    statusText = 'Degraded';
   }
 
   const isAdvisoryActive =
     id === 'shelter' && state.radiationAdvisory && !state.radiationAdvisory.resolved;
-
-  // Active crew members at this building
-  const crewHere = Object.values(state.crew).filter((c) => c.location === id);
 
   return (
     <group
@@ -355,60 +350,61 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
         </group>
       )}
 
+      {/* Ground Selection / Hover Ring */}
+      {(isSelected || hovered) && (
+        <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[3.2, 3.4, 32]} />
+          <meshBasicMaterial color={isSelected ? '#25C5F4' : '#94A3B8'} transparent opacity={0.6} side={THREE.DoubleSide} />
+        </mesh>
+      )}
+
       {/* Emissive Status Indicator Light */}
       <mesh ref={beaconRef} position={[0, id === 'comms' ? 7.2 : 3.8, 0]}>
-        <sphereGeometry args={[0.24, 12, 12]} />
+        <sphereGeometry args={[0.2, 12, 12]} />
         <meshBasicMaterial color={statusColor} />
       </mesh>
 
-      {/* Floating Interactive HTML Marker (Hidden when a modal dialog or drawer is open) */}
-      {activeModal === 'none' && !selectedEntity && (
+      {/* Floating Interactive Marker (Discreet when idle, expanded when hovered/selected; hidden during modals, inspections, or drawers) */}
+      {activeModal === 'none' && !selectedEntity && activeNavTab === 'overview' && (
         <Html
           position={[0, id === 'comms' ? 8.2 : 4.6, 0]}
-          distanceFactor={24}
+          distanceFactor={26}
           center
           zIndexRange={[5, 0]}
           className="pointer-events-auto select-none"
         >
           <div className="flex flex-col items-center">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedEntity({ type: 'building', id });
-              }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold shadow-xl backdrop-blur-md transition-all ${
-                isSelected || hovered
-                  ? 'scale-115 ring-2 ring-sky-400 -translate-y-1'
-                  : 'hover:scale-105'
-              } ${
-                isFaulted
-                  ? 'bg-red-950/90 text-red-300 border border-red-500'
-                  : condition < 50
-                  ? 'bg-amber-950/90 text-amber-300 border border-amber-500'
-                  : 'bg-slate-900/90 text-slate-200 border border-slate-600'
-              }`}
-            >
-              <span className="text-sm">{icon}</span>
-              <span className="whitespace-nowrap">{name}</span>
-              <span
-                className="w-2 h-2 rounded-full inline-block"
-                style={{ backgroundColor: statusColor }}
-              />
-            </button>
-
-            {/* Interactive Hover Telemetry Tooltip */}
-            {hovered && (
-              <div className="mt-1 px-2.5 py-1 rounded bg-slate-950/95 border border-slate-700 text-[10px] text-slate-300 shadow-2xl backdrop-blur-md whitespace-nowrap animate-fadeIn">
-                <div>
-                  Condition: <strong className="text-white">{condition}%</strong> ({statusText})
-                </div>
-                {crewHere.length > 0 && (
-                  <div className="text-sky-300">
-                    Crew present:{' '}
-                    {crewHere.map((c) => getCrewDisplayName(c).shortName).join(', ')}
-                  </div>
-                )}
-              </div>
+            {hovered || isSelected ? (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedEntity({ type: 'building', id });
+                }}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold shadow-xl backdrop-blur-md transition-all border ${
+                  isSelected
+                    ? 'bg-[#152235] border-[#25C5F4] text-white ring-1 ring-[#25C5F4]'
+                    : isFaulted
+                    ? 'bg-[#101A29]/95 text-[#EF4444] border-[#EF4444]'
+                    : condition < 50
+                    ? 'bg-[#101A29]/95 text-[#F59E0B] border-[#F59E0B]'
+                    : 'bg-[#101A29]/95 text-[#F1F5F9] border-[#26374D]'
+                }`}
+              >
+                <span className="text-xs">{icon}</span>
+                <span className="whitespace-nowrap">{name}</span>
+                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor }} />
+              </button>
+            ) : (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedEntity({ type: 'building', id });
+                }}
+                className="w-5 h-5 rounded-full bg-[#101A29]/80 border border-[#26374D] hover:border-[#25C5F4] flex items-center justify-center text-[10px] shadow-md backdrop-blur-sm cursor-pointer transition-transform hover:scale-125"
+                title={`${name} (${condition}%)`}
+              >
+                <span>{icon}</span>
+              </button>
             )}
           </div>
         </Html>

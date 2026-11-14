@@ -36,6 +36,7 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
   const setActivePlayerCrew = useGameStore((s) => s.setActivePlayerCrew);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
   const activeModal = useGameStore((s) => s.activeModal);
+  const activeNavTab = useGameStore((s) => s.activeNavTab);
 
   const groupRef = useRef<THREE.Group>(null);
   const visualRotRef = useRef<THREE.Group>(null);
@@ -302,8 +303,8 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
         )}
       </group>
 
-      {/* Floating Status Tag above astronaut (Hidden when a modal dialog or drawer is open) */}
-      {activeModal === 'none' && !selectedEntity && (
+      {/* Floating Status Tag above astronaut (Hidden during modals, drawer open, or entity inspection) */}
+      {activeModal === 'none' && !selectedEntity && activeNavTab === 'overview' && (
         <Html
           position={[0, 2.15, 0]}
           distanceFactor={22}
@@ -312,17 +313,17 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
           className="pointer-events-none select-none"
         >
           <div
-            className={`flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold shadow-lg transition-transform ${
+            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md transition-transform ${
               isPlayerControlled
-                ? 'bg-[#36C5F0] text-[#080E19] ring-2 ring-white scale-110 font-black shadow-[#36C5F0]/40'
-                : 'bg-[#080E19]/90 text-slate-200 border border-[#293A50]'
+                ? 'bg-[#25C5F4] text-[#080F1B] ring-1 ring-white font-black shadow-[0_0_8px_rgba(37,197,244,0.3)]'
+                : 'bg-[#080F1B]/90 text-[#F1F5F9] border border-[#26374D]'
             }`}
           >
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accent }} />
             <span>{getCrewDisplayName(crew).shortName}</span>
-            <span className="font-mono">({crew.stamina}h)</span>
-            {crew.currentTask && <span className="animate-pulse">⚡</span>}
-            {isPlayerControlled && <span className="text-[9px] font-black uppercase tracking-wider">[ACTIVE]</span>}
+            <span className="font-mono text-[9px] opacity-80">({crew.stamina}h)</span>
+            {crew.currentTask && <span className="text-[#25C5F4] animate-pulse">⚡</span>}
+            {isPlayerControlled && <span className="text-[8px] font-black uppercase tracking-wider">[PLAYER]</span>}
           </div>
         </Html>
       )}
