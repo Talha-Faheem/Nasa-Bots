@@ -51,6 +51,16 @@ export const CameraRig: React.FC = () => {
 
   // Pointer Lock handling for First-Person View
   useEffect(() => {
+    if (cameraMode === 'first_person') {
+      const astronaut = useGameStore.getState().astronautPositions[activePlayerCrew];
+      if (astronaut) {
+        yaw.current = astronaut.rotation || 0;
+        pitch.current = 0;
+      }
+    }
+  }, [cameraMode, activePlayerCrew]);
+
+  useEffect(() => {
     const canvas = gl.domElement;
 
     const handlePointerLockChange = () => {
@@ -154,6 +164,14 @@ export const CameraRig: React.FC = () => {
       // Apply mouse-look rotation
       const euler = new THREE.Euler(pitch.current, yaw.current, 0, 'YXZ');
       camera.quaternion.setFromEuler(euler);
+
+      // Keep astronaut model heading synchronized with helmet yaw
+      useGameStore.getState().updateAstronautPosition(activePlayerCrew, {
+        x: astronaut.x,
+        y: groundY,
+        z: astronaut.z,
+        rotation: yaw.current,
+      });
     }
   });
 
@@ -162,7 +180,7 @@ export const CameraRig: React.FC = () => {
       ref={controlsRef}
       makeDefault
       enableDamping
-      dampingFactor={0.08}
+      {...({ dampingFactor: 0.08 } as any)}
       minDistance={3.5}
       maxDistance={35}
       minPolarAngle={THREE.MathUtils.degToRad(15)}

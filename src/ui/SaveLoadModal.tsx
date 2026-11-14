@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { useGameStore } from '../store/store.ts';
+import { Save } from './icons.tsx';
 
 export const SaveLoadModal: React.FC = () => {
   const activeModal = useGameStore((s) => s.activeModal);
@@ -54,7 +55,7 @@ export const SaveLoadModal: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-[#293A50] mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl">💾</span>
+            <Save className="w-5 h-5 text-[#25C5F4]" />
             <div>
               <h3 className="text-base font-black text-white uppercase tracking-wider">
                 Mission Persistence

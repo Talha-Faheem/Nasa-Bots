@@ -9,7 +9,6 @@ import { describe, it, expect } from 'vitest';
 import {
   BUILDING_FOOTPRINTS,
   isInsideAnyBuildingFootprint,
-  isInsideInflatedObstacle,
   resolveKinematicCollision,
   globalNavGrid,
   validateBuildingPlacement,

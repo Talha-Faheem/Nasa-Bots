@@ -8,16 +8,18 @@
 import React from 'react';
 import { useGameStore } from '../store/store.ts';
 import { eventBus } from '../store/bus.ts';
+import { BUILDING_ICONS } from './icons.tsx';
+import { BuildingId } from '../sim/types.ts';
 
-const BUILDING_NAMES: { [key: string]: { name: string; icon: string; action: string } } = {
-  habitat: { name: 'Habitat Base', icon: '🏠', action: 'Rest, Sleep & Thermal Life Support' },
-  power_station: { name: 'Solar Power Array', icon: '⚡', action: 'Clean Panels, Inspect Cells & Maintenance' },
-  greenhouse: { name: 'Hydroponic Greenhouse', icon: '🌱', action: 'Plant Seeds, Tend Crops & Harvest Fresh Food' },
-  recycler: { name: 'Water Recycler', icon: '💧', action: 'Inspect Distillation, Replace Filters & Service WRS' },
-  shelter: { name: 'Radiation Shelter', icon: '☢️', action: 'Shelter Crew & Build Sintered Regolith Shield' },
-  laboratory: { name: 'Science Laboratory', icon: '🔬', action: 'Analyze Regolith, Core Ice & Research' },
-  comms: { name: 'Comms Dish', icon: '📡', action: 'Earth Uplink, Transmit Science & Consult Control' },
-  rover_bay: { name: 'Rover Bay', icon: '🚜', action: 'Prepare Rover & Deploy Polar Expeditions' },
+const BUILDING_NAMES: { [key: string]: { name: string; action: string } } = {
+  habitat: { name: 'Habitat Base', action: 'Rest, Sleep & Thermal Life Support' },
+  power_station: { name: 'Solar Power Array', action: 'Clean Panels, Inspect Cells & Maintenance' },
+  greenhouse: { name: 'Hydroponic Greenhouse', action: 'Plant Seeds, Tend Crops & Harvest Fresh Food' },
+  recycler: { name: 'Water Recycler', action: 'Inspect Distillation, Replace Filters & Service WRS' },
+  shelter: { name: 'Radiation Shelter', action: 'Shelter Crew & Build Sintered Regolith Shield' },
+  laboratory: { name: 'Science Laboratory', action: 'Analyze Regolith, Core Ice & Research' },
+  comms: { name: 'Comms Dish', action: 'Earth Uplink, Transmit Science & Consult Control' },
+  rover_bay: { name: 'Rover Bay', action: 'Prepare Rover & Deploy Polar Expeditions' },
 };
 
 export const InteractionPrompt: React.FC = () => {
@@ -30,9 +32,10 @@ export const InteractionPrompt: React.FC = () => {
 
   const info = BUILDING_NAMES[nearbyBuilding] || {
     name: nearbyBuilding,
-    icon: '⚙️',
     action: 'Operate Module',
   };
+
+  const Icon = BUILDING_ICONS[nearbyBuilding as BuildingId] || BUILDING_ICONS.habitat;
 
   const handleInteract = () => {
     setSelectedEntity(null);
@@ -46,7 +49,9 @@ export const InteractionPrompt: React.FC = () => {
         onClick={handleInteract}
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#080F1B]/95 border border-[#25C5F4] hover:border-white shadow-xl backdrop-blur-md transition-all hover:scale-105 cursor-pointer text-left group"
       >
-        <span className="text-base leading-none">{info.icon}</span>
+        <div className="p-1 rounded bg-[#152235] text-[#25C5F4]">
+          <Icon className="w-4 h-4" />
+        </div>
         <div className="flex items-center gap-1.5">
           <span className="text-xs font-bold text-white uppercase tracking-wider">
             {info.name}

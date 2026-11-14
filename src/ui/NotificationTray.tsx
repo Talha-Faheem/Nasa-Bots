@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { useGameStore } from '../store/store.ts';
 import { eventBus } from '../store/bus.ts';
+import { AlertTriangle, ChevronRight } from './icons.tsx';
 
 export const NotificationTray: React.FC = () => {
   const radiationAdvisory = useGameStore((s) => s.state.radiationAdvisory);
@@ -34,7 +35,7 @@ export const NotificationTray: React.FC = () => {
       {isAdvisoryActive && (
         <div className="pointer-events-auto w-full p-2.5 rounded-lg bg-[#101A29]/95 border border-[#F59E0B] shadow-xl backdrop-blur-md animate-fadeIn">
           <div className="flex items-start gap-2">
-            <span className="text-base text-[#F59E0B] leading-none mt-0.5">⚠️</span>
+            <AlertTriangle className="w-4 h-4 text-[#F59E0B] shrink-0 mt-0.5" />
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#F59E0B]">
@@ -62,9 +63,10 @@ export const NotificationTray: React.FC = () => {
                   }
                   eventBus.emit('sound:play', { name: 'alarm' });
                 }}
-                className="mt-1.5 w-full py-1 rounded bg-[#F59E0B] hover:bg-[#F59E0B]/80 text-[#080F1B] text-[10px] font-black transition-all cursor-pointer shadow"
+                className="mt-1.5 w-full py-1 rounded bg-[#F59E0B] hover:bg-[#F59E0B]/80 text-[#080F1B] text-[10px] font-black transition-all cursor-pointer shadow flex items-center justify-center gap-1"
               >
-                Shelter All Astronauts ➔
+                <span>Shelter All Astronauts</span>
+                <ChevronRight className="w-3 h-3" />
               </button>
             </div>
           </div>

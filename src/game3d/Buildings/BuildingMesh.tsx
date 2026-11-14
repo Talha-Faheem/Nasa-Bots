@@ -14,14 +14,16 @@ import { useGameStore } from '../../store/store.ts';
 import { eventBus } from '../../store/bus.ts';
 import { GLTFModel } from '../ModelLoader.tsx';
 import { getTerrainHeight } from '../Physics/TerrainHeight.ts';
+import { BUILDING_ICONS } from '../../ui/icons.tsx';
 
 interface BuildingProps {
   id: BuildingId;
   name: string;
-  icon: string;
+  icon?: string;
 }
 
-export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
+export const BuildingMesh: React.FC<BuildingProps> = ({ id, name }) => {
+  const Icon = BUILDING_ICONS[id];
   const [hovered, setHovered] = useState(false);
   const selectedBuilding = useGameStore((s) => s.selectedBuilding);
   const setSelectedEntity = useGameStore((s) => s.setSelectedEntity);
@@ -383,7 +385,7 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
                     : 'bg-[#101A29]/95 text-[#F1F5F9] border-[#26374D]'
                 }`}
               >
-                <span className="text-xs">{icon}</span>
+                {Icon && <Icon className="w-3.5 h-3.5 text-[#25C5F4] flex-shrink-0" />}
                 <span className="whitespace-nowrap">{name}</span>
                 <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: statusColor }} />
               </button>
@@ -393,10 +395,10 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
                   e.stopPropagation();
                   setSelectedEntity({ type: 'building', id });
                 }}
-                className="w-5 h-5 rounded-full bg-[#101A29]/80 border border-[#26374D] hover:border-[#25C5F4] flex items-center justify-center text-[10px] shadow-md backdrop-blur-sm cursor-pointer transition-transform hover:scale-125"
+                className="w-5 h-5 rounded-full bg-[#101A29]/80 border border-[#26374D] hover:border-[#25C5F4] flex items-center justify-center text-[10px] shadow-md backdrop-blur-sm cursor-pointer transition-transform hover:scale-125 text-[#25C5F4]"
                 title={`${name} (${condition}%)`}
               >
-                <span>{icon}</span>
+                {Icon ? <Icon className="w-3 h-3 text-[#25C5F4]" /> : null}
               </button>
             )}
           </div>

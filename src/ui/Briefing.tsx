@@ -1,110 +1,212 @@
 /**
  * LUNAR FRONTIER: THE LAST 30 DAYS
  * src/ui/Briefing.tsx
- * Welcome & Mission Launch Briefing with difficulty choice, crew review, and seed control.
+ * Minimal, clean mission briefing overlay matching the main menu design system:
+ * - Clean chamfered sci-fi panel with subtle entrance animation.
+ * - Restrained, elegant palette: deep space navy, slate, and crisp cyan accents.
+ * - Zero emojis — clean monochrome Lucide SVG icons.
+ * - Minimal, uncluttered typography and generous whitespace.
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import {
+  Zap,
+  Satellite,
+  Shield,
+  Wrench,
+  Sprout,
+  Pickaxe,
+  HeartPulse,
+} from 'lucide-react';
 import { useGameStore } from '../store/store.ts';
+import { eventBus } from '../store/bus.ts';
+import { THEME, chamferedBtnStyle } from './theme.ts';
 
 export const BriefingModal: React.FC = () => {
   const activeModal = useGameStore((s) => s.activeModal);
   const setModal = useGameStore((s) => s.setModal);
   const state = useGameStore((s) => s.state);
+  const reducedMotion = useGameStore((s) => s.reducedMotion);
+
+  const handleClose = () => {
+    eventBus.emit('sound:play', { name: 'click' });
+    setModal('none');
+  };
+
+  const handleCommence = () => {
+    eventBus.emit('sound:play', { name: 'click' });
+    setModal('none');
+  };
+
+  // Keyboard navigation: Enter starts mission, Escape dismisses
+  useEffect(() => {
+    if (activeModal !== 'briefing') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleCommence();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        handleClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeModal]);
 
   if (activeModal !== 'briefing') return null;
 
+  const playHoverSound = () => {
+    eventBus.emit('sound:play', { name: 'click' });
+  };
+
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border-2 border-sky-500 rounded-2xl max-w-2xl w-full p-6 shadow-2xl text-slate-200 max-h-[90vh] overflow-y-auto">
-        <div className="text-center pb-4 border-b border-slate-800">
-          <div className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-950 text-sky-300 border border-sky-600 mb-2">
-            NASA Space Apps Challenge 2026 · Junior Astronaut Mission Trainer
+    <div className="fixed inset-0 z-[9999] bg-[#050A14]/85 backdrop-blur-md flex items-center justify-center p-4 select-none isolate">
+      {/* Minimal Chamfered Dossier Card */}
+      <div
+        className={`relative w-full max-w-2xl bg-[#080E1B]/95 border border-[#2EC4D6]/50 shadow-2xl text-[#E6F1F5] font-sans p-6 sm:p-8 max-h-[90vh] overflow-y-auto ${
+          reducedMotion ? '' : 'animate-modal-in'
+        }`}
+        style={{ clipPath: THEME.clipPaths.chamferedCard }}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between border-b border-[#26374D]/60 pb-3 mb-4">
+          <div>
+            <div className="text-[10px] font-mono tracking-[0.25em] text-[#2EC4D6] uppercase">
+              Mission Briefing · Artemis Outpost Alpha
+            </div>
+            <h1
+              className="text-2xl font-black uppercase tracking-[0.16em] text-[#E6F1F5] mt-1"
+              style={{ fontFamily: THEME.fonts.title }}
+            >
+              Lunar Frontier: The Last 30 Days
+            </h1>
           </div>
-          <h1 className="text-3xl font-black text-white tracking-wide">
-            LUNAR FRONTIER: THE LAST 30 DAYS
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 max-w-lg mx-auto">
-            You are the Mission Commander of Artemis Outpost Alpha near the Moon's south pole.
-            Balance life support, power, water, food, and space weather radiation for 30 days until
-            relief arrives.
-          </p>
+          <button
+            onClick={handleClose}
+            onMouseEnter={playHoverSound}
+            className="text-[#8FA6B2] hover:text-[#2EC4D6] text-xl font-bold px-2 py-0.5 transition-colors cursor-pointer"
+            aria-label="Close"
+          >
+            ✕
+          </button>
         </div>
 
-        {/* Core Game Pillars for Kids 7-12 */}
-        <div className="grid grid-cols-3 gap-2.5 my-4 text-center">
-          <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-xl">⚡</span>
-            <div className="text-xs font-bold text-white mt-1">No Free Choices</div>
-            <div className="text-[10px] text-slate-400 mt-0.5">
-              Every action costs time, power, or spare parts.
-            </div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-xl">🛰️</span>
-            <div className="text-xs font-bold text-white mt-1">Real NASA Data</div>
-            <div className="text-[10px] text-slate-400 mt-0.5">
-              Live and archived space weather from DONKI & OSDR.
-            </div>
-          </div>
-          <div className="p-2.5 rounded-xl bg-slate-950 border border-slate-800">
-            <span className="text-xl">🛡️</span>
-            <div className="text-xs font-bold text-white mt-1">Safe to Learn</div>
-            <div className="text-[10px] text-slate-400 mt-0.5">
-              Missions end in safe evacuation, never graphic harm.
-            </div>
-          </div>
-        </div>
+        {/* Narrative / Context */}
+        <p className="text-xs text-[#94A3B8] leading-relaxed mb-5">
+          You are the Commander of Artemis Outpost Alpha near the lunar south pole.
+          Balance life support, power, water, food, and space weather radiation over a 30-day
+          expedition until relief arrives.
+        </p>
 
-        {/* Crew Roster Overview */}
-        <div className="mb-4">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">
-            Your 4 Astronaut Specialists:
+        {/* 3 Core Pillars - Clean, minimal cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mb-5">
+          <div className="p-3 bg-[#0D1826]/70 border border-[#1E2E42] rounded transition-all duration-200 hover:border-[#2EC4D6]/50">
+            <div className="flex items-center gap-2 mb-1">
+              <Zap className="w-4 h-4 text-[#2EC4D6]" />
+              <span className="text-xs font-bold text-white tracking-wide">No Free Choices</span>
+            </div>
+            <p className="text-[11px] text-[#8FA6B2] leading-tight">
+              Every action consumes crew work hours, power, or spare parts.
+            </p>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-xs">
-            <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-2">
-              <span className="text-xl">🔧</span>
-              <div>
-                <strong className="text-white">Alex Morgan</strong> (Systems Engineer)
-                <div className="text-[10px] text-sky-400">Repairs systems 1 hour faster</div>
-              </div>
+
+          <div className="p-3 bg-[#0D1826]/70 border border-[#1E2E42] rounded transition-all duration-200 hover:border-[#2EC4D6]/50">
+            <div className="flex items-center gap-2 mb-1">
+              <Satellite className="w-4 h-4 text-[#2EC4D6]" />
+              <span className="text-xs font-bold text-white tracking-wide">Real NASA Data</span>
             </div>
-            <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-2">
-              <span className="text-xl">🌱</span>
-              <div>
-                <strong className="text-white">Dr. Sara Williams</strong> (Biologist)
-                <div className="text-[10px] text-emerald-400">Greenhouse yield +10%</div>
-              </div>
+            <p className="text-[11px] text-[#8FA6B2] leading-tight">
+              Telemetry driven by NASA DONKI solar weather and OSDR research.
+            </p>
+          </div>
+
+          <div className="p-3 bg-[#0D1826]/70 border border-[#1E2E42] rounded transition-all duration-200 hover:border-[#2EC4D6]/50">
+            <div className="flex items-center gap-2 mb-1">
+              <Shield className="w-4 h-4 text-[#2EC4D6]" />
+              <span className="text-xs font-bold text-white tracking-wide">Safe to Learn</span>
             </div>
-            <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-2">
-              <span className="text-xl">⛏️</span>
-              <div>
-                <strong className="text-white">Daniel Brooks</strong> (Geologist)
-                <div className="text-[10px] text-amber-400">Rover samples yield +3 science</div>
-              </div>
-            </div>
-            <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 flex items-center gap-2">
-              <span className="text-xl">🩺</span>
-              <div>
-                <strong className="text-white">Dr. Maya Chen</strong> (Flight Surgeon)
-                <div className="text-[10px] text-pink-400">+1 extra daily health recovery</div>
-              </div>
-            </div>
+            <p className="text-[11px] text-[#8FA6B2] leading-tight">
+              Missions conclude in supportive debriefs and evacuation, never harm.
+            </p>
           </div>
         </div>
 
-        {/* Mission Details & Start Button */}
-        <div className="flex items-center justify-between pt-3 border-t border-slate-800">
-          <div className="text-[11px] text-slate-400">
-            Seed: <strong className="text-white font-mono">{state.mission.seed}</strong> · Site:{' '}
-            <strong className="text-sky-300">Lunar South Pole</strong>
+        {/* Crew Roster (Clean 4-crew grid) */}
+        <div className="mb-6">
+          <div className="text-[10px] font-mono uppercase tracking-[0.15em] text-[#8FA6B2] mb-2">
+            Astronaut Specialists (4)
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            <div
+              onMouseEnter={playHoverSound}
+              className="p-2.5 bg-[#0D1826]/50 border border-[#1E2E42] rounded flex items-center gap-3 transition-all duration-200 hover:border-[#2EC4D6]/50 hover:bg-[#0D1826]"
+            >
+              <div className="p-1.5 rounded bg-[#2EC4D6]/10 text-[#2EC4D6]">
+                <Wrench className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-white">Alex Morgan</div>
+                <div className="text-[10px] text-[#8FA6B2]">Systems Engineer · Repairs +1h faster</div>
+              </div>
+            </div>
+
+            <div
+              onMouseEnter={playHoverSound}
+              className="p-2.5 bg-[#0D1826]/50 border border-[#1E2E42] rounded flex items-center gap-3 transition-all duration-200 hover:border-[#2EC4D6]/50 hover:bg-[#0D1826]"
+            >
+              <div className="p-1.5 rounded bg-[#2EC4D6]/10 text-[#2EC4D6]">
+                <Sprout className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-white">Dr. Sara Williams</div>
+                <div className="text-[10px] text-[#8FA6B2]">Biologist · Greenhouse yield +10%</div>
+              </div>
+            </div>
+
+            <div
+              onMouseEnter={playHoverSound}
+              className="p-2.5 bg-[#0D1826]/50 border border-[#1E2E42] rounded flex items-center gap-3 transition-all duration-200 hover:border-[#2EC4D6]/50 hover:bg-[#0D1826]"
+            >
+              <div className="p-1.5 rounded bg-[#2EC4D6]/10 text-[#2EC4D6]">
+                <Pickaxe className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-white">Daniel Brooks</div>
+                <div className="text-[10px] text-[#8FA6B2]">Geologist · Rover samples +3 science</div>
+              </div>
+            </div>
+
+            <div
+              onMouseEnter={playHoverSound}
+              className="p-2.5 bg-[#0D1826]/50 border border-[#1E2E42] rounded flex items-center gap-3 transition-all duration-200 hover:border-[#2EC4D6]/50 hover:bg-[#0D1826]"
+            >
+              <div className="p-1.5 rounded bg-[#2EC4D6]/10 text-[#2EC4D6]">
+                <HeartPulse className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-xs font-semibold text-white">Dr. Maya Chen</div>
+                <div className="text-[10px] text-[#8FA6B2]">Flight Surgeon · +1 health recovery</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-[#26374D]/60 font-mono text-xs">
+          <div className="text-[11px] text-[#8FA6B2]">
+            SEED: <span className="text-[#2EC4D6]">#{state.mission.seed}</span> · SITE: LUNAR SOUTH POLE
           </div>
 
           <button
-            onClick={() => setModal('none')}
-            className="px-6 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 text-sm font-black shadow-xl transition-transform hover:scale-105"
+            onClick={handleCommence}
+            onMouseEnter={playHoverSound}
+            className={chamferedBtnStyle}
+            style={{ clipPath: THEME.clipPaths.chamferedBtn }}
           >
-            Commence Mission Day 1 ➔
+            COMMENCE MISSION
           </button>
         </div>
       </div>

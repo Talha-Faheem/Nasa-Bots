@@ -5,6 +5,7 @@
  */
 
 import React, { useRef } from 'react';
+import * as THREE from 'three';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import { Terrain } from './Terrain.tsx';
@@ -43,7 +44,7 @@ const SimAccumulator: React.FC = () => {
   return null;
 };
 
-// Procedural Earth in the Lunar Sky
+// Procedural Earth in the Lunar Sky with atmospheric halo
 const EarthInSky: React.FC = () => {
   return (
     <group position={[35, 45, -75]}>
@@ -51,14 +52,14 @@ const EarthInSky: React.FC = () => {
       <mesh>
         <sphereGeometry args={[4.2, 32, 32]} />
         <meshStandardMaterial
-          color="#2563eb"
-          roughness={0.6}
+          color="#1e40af"
+          roughness={0.5}
           metalness={0.1}
-          emissive="#1d4ed8"
-          emissiveIntensity={0.2}
+          emissive="#1e3a8a"
+          emissiveIntensity={0.25}
         />
       </mesh>
-      {/* Cloud & Land Swirl Layers */}
+      {/* Cloud & Continent Swirl Layer */}
       <mesh position={[0, 0, 0.05]}>
         <sphereGeometry args={[4.26, 32, 16]} />
         <meshStandardMaterial
@@ -66,6 +67,16 @@ const EarthInSky: React.FC = () => {
           transparent
           opacity={0.35}
           roughness={0.8}
+        />
+      </mesh>
+      {/* Atmospheric Rayleigh Glow Ring */}
+      <mesh>
+        <sphereGeometry args={[4.55, 32, 16]} />
+        <meshBasicMaterial
+          color="#60a5fa"
+          transparent
+          opacity={0.15}
+          side={THREE.BackSide}
         />
       </mesh>
     </group>
@@ -80,8 +91,8 @@ export const World: React.FC = () => {
         gl={{ antialias: true, alpha: false }}
         camera={{ position: [0, 24, 28], fov: 45 }}
       >
-        <color attach="background" args={['#050811']} />
-        <fog attach="fog" args={['#050811', 30, 110]} />
+        <color attach="background" args={['#03060d']} />
+        <fog attach="fog" args={['#03060d', 75, 150]} />
 
         {/* Procedural deep space starfield */}
         <Stars radius={100} depth={50} count={3500} factor={4} saturation={0} fade speed={0.5} />
@@ -100,14 +111,14 @@ export const World: React.FC = () => {
         <DepositMarkers />
 
         {/* 8 Outpost Buildings */}
-        <BuildingMesh id="habitat" name="Habitat Base" icon="🏠" />
-        <BuildingMesh id="power_station" name="Solar Power Array" icon="⚡" />
-        <BuildingMesh id="greenhouse" name="Hydroponic Greenhouse" icon="🌱" />
-        <BuildingMesh id="recycler" name="Water Recycler" icon="💧" />
-        <BuildingMesh id="shelter" name="Radiation Shelter" icon="☢️" />
-        <BuildingMesh id="laboratory" name="Research Laboratory" icon="🔬" />
-        <BuildingMesh id="comms" name="Comms Dish" icon="📡" />
-        <BuildingMesh id="rover_bay" name="Rover Bay" icon="🚜" />
+        <BuildingMesh id="habitat" name="Habitat Base" />
+        <BuildingMesh id="power_station" name="Solar Power Array" />
+        <BuildingMesh id="greenhouse" name="Hydroponic Greenhouse" />
+        <BuildingMesh id="recycler" name="Water Recycler" />
+        <BuildingMesh id="shelter" name="Radiation Shelter" />
+        <BuildingMesh id="laboratory" name="Research Laboratory" />
+        <BuildingMesh id="comms" name="Comms Dish" />
+        <BuildingMesh id="rover_bay" name="Rover Bay" />
 
         {/* Dynamic Crew Figures & Rover */}
         <CrewRoster3D />

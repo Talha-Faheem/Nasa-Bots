@@ -387,3 +387,8 @@ export const useGameStore = create<GameStoreState>((set, get) => {
   };
 });
 
+if (typeof window !== 'undefined') {
+  (window as any).__GAME_STORE__ = useGameStore;
+}
+
+

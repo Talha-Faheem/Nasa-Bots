@@ -6,11 +6,23 @@
 
 import React, { useState } from 'react';
 import { useGameStore } from '../store/store.ts';
+import {
+  Compass,
+  Clock,
+  Zap,
+  Wind,
+  Droplets,
+  Sprout,
+  Users,
+  Radiation,
+  FlaskConical,
+  BookOpen,
+} from './icons.tsx';
 
 interface ManualSection {
   id: string;
   title: string;
-  icon: string;
+  icon: React.ComponentType<{ className?: string }>;
   content: React.ReactNode;
 }
 
@@ -27,7 +39,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'getting_started',
       title: '1. Getting Started & Controls',
-      icon: '🚀',
+      icon: Compass,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">Welcome to Mission Control!</h4>
@@ -54,7 +66,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'time_and_ticks',
       title: '2. Time & 24-Tick Simulation',
-      icon: '⏱️',
+      icon: Clock,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">How Time Passes on the Moon</h4>
@@ -73,7 +85,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'resources_power',
       title: '3. Electrical Power & Solar Night',
-      icon: '⚡',
+      icon: Zap,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">Photovoltaics & Priority Load Shedding</h4>
@@ -103,7 +115,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'resources_life_support',
       title: '4. Oxygen & Life Support (ECLSS)',
-      icon: '💨',
+      icon: Wind,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">Atmospheric Revitalization</h4>
@@ -120,7 +132,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'resources_water',
       title: '5. Water Recycling & Closed-Loop Recovery',
-      icon: '💧',
+      icon: Droplets,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">Closed-Loop Hydrology</h4>
@@ -137,7 +149,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'resources_food',
       title: '6. Hydroponics & Crop Harvests',
-      icon: '🌱',
+      icon: Sprout,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">Growing Food Without Soil</h4>
@@ -170,7 +182,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'astronauts_guide',
       title: '7. Astronaut Roster & Perks',
-      icon: '👨‍🚀',
+      icon: Users,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">The Expedition Crew</h4>
@@ -198,7 +210,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'space_weather',
       title: '8. Space Weather & Radiation Protection',
-      icon: '☢️',
+      icon: Radiation,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">Solar Flares & Coronal Mass Ejections</h4>
@@ -221,7 +233,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'rover_and_science',
       title: '9. Rover Expeditions & Lab Research',
-      icon: '🔬',
+      icon: FlaskConical,
       content: (
         <div className="space-y-3">
           <h4 className="text-base font-black text-white">Scientific Discovery on the Moon</h4>
@@ -237,7 +249,7 @@ export const UserManualModal: React.FC = () => {
     {
       id: 'stem_glossary',
       title: '10. Junior Astronaut STEM Glossary',
-      icon: '📚',
+      icon: BookOpen,
       content: (
         <div className="space-y-2.5 text-xs text-[#A7B4C8]">
           <div>
@@ -279,8 +291,8 @@ export const UserManualModal: React.FC = () => {
         {/* Modal Header */}
         <div className="p-4 border-b border-[#293A50] bg-[#111C2D] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#36C5F0]/20 border border-[#36C5F0] flex items-center justify-center text-lg">
-              📖
+            <div className="w-9 h-9 rounded-xl bg-[#36C5F0]/20 border border-[#36C5F0] flex items-center justify-center text-[#36C5F0]">
+              <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <h2 className="text-base font-black text-white uppercase tracking-wider">
@@ -311,27 +323,30 @@ export const UserManualModal: React.FC = () => {
               className="w-full p-2 rounded-xl bg-[#111C2D] border border-[#293A50] text-xs text-white placeholder-[#A7B4C8] mb-2 focus:outline-none focus:border-[#36C5F0]"
             />
             <div className="space-y-1 overflow-y-auto flex-1 pr-1">
-              {filteredSections.map((sec) => (
-                <button
-                  key={sec.id}
-                  onClick={() => setActiveSectionId(sec.id)}
-                  className={`w-full p-2 rounded-xl text-left text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                    activeSectionId === sec.id
-                      ? 'bg-[#36C5F0] text-[#080E19] shadow-md'
-                      : 'text-[#A7B4C8] hover:bg-[#17263A] hover:text-white'
-                  }`}
-                >
-                  <span>{sec.icon}</span>
-                  <span className="truncate">{sec.title}</span>
-                </button>
-              ))}
+              {filteredSections.map((sec) => {
+                const SecIcon = sec.icon;
+                return (
+                  <button
+                    key={sec.id}
+                    onClick={() => setActiveSectionId(sec.id)}
+                    className={`w-full p-2 rounded-xl text-left text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
+                      activeSectionId === sec.id
+                        ? 'bg-[#36C5F0] text-[#080E19] shadow-md'
+                        : 'text-[#A7B4C8] hover:bg-[#17263A] hover:text-white'
+                    }`}
+                  >
+                    <SecIcon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{sec.title}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           {/* Article Content */}
           <div className="flex-1 p-6 overflow-y-auto space-y-4 text-xs text-[#A7B4C8] leading-relaxed">
             <div className="flex items-center gap-2 pb-2 border-b border-[#293A50] text-[#36C5F0]">
-              <span className="text-2xl">{activeSection.icon}</span>
+              {React.createElement(activeSection.icon, { className: 'w-6 h-6 flex-shrink-0' })}
               <h3 className="text-lg font-black text-white">{activeSection.title}</h3>
             </div>
             {activeSection.content}

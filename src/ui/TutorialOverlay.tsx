@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { useGameStore } from '../store/store.ts';
+import { GraduationCap, ChevronRight } from './icons.tsx';
 
 interface StepData {
   title: string;
@@ -90,9 +91,9 @@ export const TutorialOverlay: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-[#293A50] mb-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🎓</span>
+            <GraduationCap className="w-5 h-5 text-[#36C5F0]" />
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#36C5F0] block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#36C5F0] block font-mono">
                 {current.badge}
               </span>
               <h3 className="text-base font-black text-white">{current.title}</h3>
@@ -100,7 +101,7 @@ export const TutorialOverlay: React.FC = () => {
           </div>
           <button
             onClick={() => setTutorialStep(-1)}
-            className="text-xs text-[#A7B4C8] hover:text-white font-bold cursor-pointer"
+            className="text-xs text-[#A7B4C8] hover:text-white font-bold cursor-pointer font-mono"
           >
             Skip Tutorial
           </button>
@@ -137,9 +138,10 @@ export const TutorialOverlay: React.FC = () => {
                 setTutorialStep(tutorialStep + 1);
               }
             }}
-            className="px-5 py-2 rounded-xl bg-[#36C5F0] hover:bg-[#36C5F0]/80 text-[#080E19] text-xs font-black shadow-lg transition-transform hover:scale-105 cursor-pointer"
+            className="px-5 py-2 rounded-xl bg-[#36C5F0] hover:bg-[#36C5F0]/80 text-[#080E19] text-xs font-black shadow-lg transition-transform hover:scale-105 cursor-pointer flex items-center gap-1"
           >
-            {isLast ? 'Complete Training ➔' : 'Next Step ➔'}
+            <span>{isLast ? 'Complete Training' : 'Next Step'}</span>
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>

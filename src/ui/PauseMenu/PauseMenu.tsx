@@ -13,6 +13,7 @@ import { THEME, chamferedBtnStyle } from '../theme.ts';
 import { ControlsModal } from './ControlsModal.tsx';
 import { useGameStore } from '../../store/store.ts';
 import { eventBus } from '../../store/bus.ts';
+import { BarChart3, Users } from '../icons.tsx';
 
 export const PauseMenu: React.FC = () => {
   const [showControls, setShowControls] = useState(false);
@@ -168,7 +169,7 @@ export const PauseMenu: React.FC = () => {
             {/* 1. Life Support & Power Reserves */}
             <div>
               <div className="text-[11px] font-bold text-[#2EC4D6] uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <span>📊</span> RESOURCE BUFFER & LIFE SUPPORT STATUS
+                <BarChart3 className="w-3.5 h-3.5 text-[#2EC4D6]" /> RESOURCE BUFFER & LIFE SUPPORT STATUS
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2 rounded bg-[#080F1B] border border-[#1E2E42]">
@@ -228,7 +229,7 @@ export const PauseMenu: React.FC = () => {
             {/* 2. Crew Vitals Summary */}
             <div>
               <div className="text-[11px] font-bold text-[#2EC4D6] uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <span>👨‍🚀</span> EXPEDITION CREW VITALS
+                <Users className="w-3.5 h-3.5 text-[#2EC4D6]" /> EXPEDITION CREW VITALS
               </div>
               <div className="grid grid-cols-2 gap-2">
                 {Object.values(state.crew).map((c) => (

@@ -13,6 +13,7 @@ import { BUILDING_COORDINATES, getCrewDisplayName } from '../sim/rules/crew.ts';
 import { useGameStore } from '../store/store.ts';
 import { eventBus } from '../store/bus.ts';
 import { getTerrainHeight, getTerrainSample } from './Physics/TerrainHeight.ts';
+import { Zap } from '../ui/icons.tsx';
 
 const SUIT_ACCENTS: Record<CrewId, string> = {
   alex: '#3b82f6', // Systems Blue
@@ -352,7 +353,7 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: accent }} />
             <span>{getCrewDisplayName(crew).shortName}</span>
             <span className="font-mono text-[9px] opacity-80">({crew.stamina}h)</span>
-            {crew.currentTask && <span className="text-[#25C5F4] animate-pulse">⚡</span>}
+            {crew.currentTask && <Zap className="w-2.5 h-2.5 text-[#25C5F4] animate-pulse" />}
             {isPlayerControlled && <span className="text-[8px] font-black uppercase tracking-wider">[PLAYER]</span>}
           </div>
         </Html>

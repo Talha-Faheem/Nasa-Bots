@@ -13,19 +13,39 @@ import { ROVER_DESTINATIONS } from '../sim/rules/rover.ts';
 import { CONSTRUCTION_PROJECTS } from '../sim/rules/construction.ts';
 import { getCrewDisplayName } from '../sim/rules/crew.ts';
 import { eventBus } from '../store/bus.ts';
+import {
+  Compass,
+  Users,
+  Building2,
+  Activity,
+  FlaskConical,
+  Truck,
+  Hammer,
+  Package,
+  Target,
+  Trophy,
+  BarChart3,
+  AlertTriangle,
+  Flame,
+  Snowflake,
+  Layers,
+  Cog,
+  Sun,
+  BUILDING_ICONS,
+} from './icons.tsx';
 
-const NAV_ITEMS: { id: ActiveNavTab; label: string; icon: string }[] = [
-  { id: 'overview', label: 'Overview', icon: '🌐' },
-  { id: 'astronauts', label: 'Crew Management', icon: '👨‍🚀' },
-  { id: 'buildings', label: 'Base Infrastructure', icon: '🏢' },
-  { id: 'operations', label: 'Mission Operations', icon: '⚡' },
-  { id: 'research', label: 'Research Lab', icon: '🔬' },
-  { id: 'rover', label: 'Rover Expeditions', icon: '🚜' },
-  { id: 'construction', label: 'Base Expansion', icon: '🏗️' },
-  { id: 'inventory', label: 'Inventory & Storage', icon: '📦' },
-  { id: 'objectives', label: 'Objectives', icon: '🎯' },
-  { id: 'achievements', label: 'Achievements', icon: '🏆' },
-  { id: 'stats', label: 'Analytics', icon: '📊' },
+const NAV_ITEMS: { id: ActiveNavTab; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'overview', label: 'Overview', icon: Compass },
+  { id: 'astronauts', label: 'Crew Management', icon: Users },
+  { id: 'buildings', label: 'Base Infrastructure', icon: Building2 },
+  { id: 'operations', label: 'Mission Operations', icon: Activity },
+  { id: 'research', label: 'Research Lab', icon: FlaskConical },
+  { id: 'rover', label: 'Rover Expeditions', icon: Truck },
+  { id: 'construction', label: 'Base Expansion', icon: Hammer },
+  { id: 'inventory', label: 'Inventory & Storage', icon: Package },
+  { id: 'objectives', label: 'Objectives', icon: Target },
+  { id: 'achievements', label: 'Achievements', icon: Trophy },
+  { id: 'stats', label: 'Analytics', icon: BarChart3 },
 ];
 
 export const LeftNavPanel: React.FC = () => {
@@ -59,7 +79,7 @@ export const LeftNavPanel: React.FC = () => {
               title={item.label}
               aria-label={item.label}
             >
-              <span>{item.icon}</span>
+              <item.icon className="w-4 h-4" />
               {/* Tooltip on hover */}
               <span className="absolute left-full ml-2 px-2 py-1 rounded bg-[#101A29] text-[#F1F5F9] text-[10px] font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-[#26374D] shadow-xl pointer-events-none z-50">
                 {item.label}
@@ -75,9 +95,10 @@ export const LeftNavPanel: React.FC = () => {
           {/* Drawer Header */}
           <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#26374D] bg-[#101A29]">
             <div className="flex items-center gap-2">
-              <span className="text-base">
-                {NAV_ITEMS.find((n) => n.id === activeNavTab)?.icon}
-              </span>
+              {(() => {
+                const ActiveIcon = NAV_ITEMS.find((n) => n.id === activeNavTab)?.icon;
+                return ActiveIcon ? <ActiveIcon className="w-4 h-4 text-[#25C5F4]" /> : null;
+              })()}
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#F1F5F9]">
                 {NAV_ITEMS.find((n) => n.id === activeNavTab)?.label}
               </h3>
@@ -183,16 +204,17 @@ export const LeftNavPanel: React.FC = () => {
                 <div className="text-[11px] text-[#94A3B8] mb-1">
                   Select a module to inspect telemetry and perform maintenance:
                 </div>
-                {[
-                  ['habitat', 'Habitat Base', '🏠'],
-                  ['power_station', 'Solar Power Array', '⚡'],
-                  ['greenhouse', 'Hydroponic Greenhouse', '🌱'],
-                  ['recycler', 'Water Recycler', '💧'],
-                  ['shelter', 'Radiation Shelter', '☢️'],
-                  ['laboratory', 'Research Laboratory', '🔬'],
-                  ['comms', 'Comms Dish', '📡'],
-                  ['rover_bay', 'Rover Bay', '🚜'],
-                ].map(([bid, bname, bicon]) => {
+                {([
+                  ['habitat', 'Habitat Base'],
+                  ['power_station', 'Solar Power Array'],
+                  ['greenhouse', 'Hydroponic Greenhouse'],
+                  ['recycler', 'Water Recycler'],
+                  ['shelter', 'Radiation Shelter'],
+                  ['laboratory', 'Research Laboratory'],
+                  ['comms', 'Comms Dish'],
+                  ['rover_bay', 'Rover Bay'],
+                ] as const).map(([bid, bname]) => {
+                  const BIcon = BUILDING_ICONS[bid as BuildingId];
                   let condition = 100;
                   let isFaulted = false;
                   if (bid === 'power_station') {
@@ -224,12 +246,24 @@ export const LeftNavPanel: React.FC = () => {
                       }}
                       className="w-full p-2.5 rounded-lg bg-[#101A29] hover:bg-[#152235] border border-[#26374D] hover:border-[#25C5F4]/60 text-left transition-all cursor-pointer flex items-center justify-between"
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">{bicon}</span>
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-1.5 rounded bg-[#152235] text-[#25C5F4]">
+                          <BIcon className="w-4 h-4" />
+                        </div>
                         <div>
                           <div className="text-xs font-bold text-white">{bname}</div>
-                          <div className="text-[10px] text-[#94A3B8]">
-                            {isFaulted ? '⚠️ Faulted' : condition < 50 ? '⚠️ Damaged' : 'Nominal'}
+                          <div className="text-[10px] text-[#94A3B8] flex items-center gap-1">
+                            {isFaulted ? (
+                              <span className="text-[#EF4444] flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3" /> Faulted
+                              </span>
+                            ) : condition < 50 ? (
+                              <span className="text-[#F59E0B] flex items-center gap-1">
+                                <AlertTriangle className="w-3 h-3" /> Damaged
+                              </span>
+                            ) : (
+                              'Nominal'
+                            )}
                           </div>
                         </div>
                       </div>
@@ -456,7 +490,7 @@ export const LeftNavPanel: React.FC = () => {
                 <div className="p-2.5 rounded-lg bg-[#101A29] border border-[#26374D]">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-[10px] font-bold text-[#25C5F4] uppercase tracking-wider flex items-center gap-1.5">
-                      <span>⚗️</span> In-Situ Processing Refinery
+                      <Flame className="w-3.5 h-3.5 text-[#25C5F4]" /> In-Situ Processing Refinery
                     </span>
                     <span className="text-[9px] font-mono text-[#94A3B8]">ISRU Plant</span>
                   </div>
@@ -464,8 +498,8 @@ export const LeftNavPanel: React.FC = () => {
                     {/* Recipe 1: Water Ice */}
                     <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-bold text-white flex items-center gap-1">
-                          <span>❄️</span> Melt Cryogenic Ice
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <Snowflake className="w-3.5 h-3.5 text-[#38bdf8]" /> Melt Cryogenic Ice
                         </span>
                         <span className="text-[10px] font-mono text-[#22C55E]">10kg Ice → 9L Water</span>
                       </div>
@@ -492,8 +526,8 @@ export const LeftNavPanel: React.FC = () => {
                     {/* Recipe 2: Regolith Sintering */}
                     <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-bold text-white flex items-center gap-1">
-                          <span>🧱</span> Microwave Sinter Regolith
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <Layers className="w-3.5 h-3.5 text-[#f59e0b]" /> Microwave Sinter Regolith
                         </span>
                         <span className="text-[10px] font-mono text-[#22C55E]">25kg Regolith → 2 Blocks</span>
                       </div>
@@ -520,8 +554,8 @@ export const LeftNavPanel: React.FC = () => {
                     {/* Recipe 3: Ore Smelting */}
                     <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-bold text-white flex items-center gap-1">
-                          <span>⚙️</span> Smelt Ilmenite Ore
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <Cog className="w-3.5 h-3.5 text-[#94a3b8]" /> Smelt Ilmenite Ore
                         </span>
                         <span className="text-[10px] font-mono text-[#22C55E]">15kg Ore → 1 Part + 2 Comp</span>
                       </div>
@@ -548,8 +582,8 @@ export const LeftNavPanel: React.FC = () => {
                     {/* Recipe 4: Silicon Solar Cells */}
                     <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
                       <div className="flex justify-between items-center text-xs">
-                        <span className="font-bold text-white flex items-center gap-1">
-                          <span>☀️</span> Fabricate Solar Cells
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <Sun className="w-3.5 h-3.5 text-[#fbbf24]" /> Fabricate Solar Cells
                         </span>
                         <span className="text-[10px] font-mono text-[#22C55E]">10kg Silicon → 1 Cell</span>
                       </div>

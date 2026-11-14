@@ -32,7 +32,7 @@ const ModelInner: React.FC<GLTFModelProps> = ({
 
   // Apply shadows to all child meshes in the cloned scene
   React.useEffect(() => {
-    scene.traverse((child) => {
+    scene.traverse((child: THREE.Object3D) => {
       if ((child as THREE.Mesh).isMesh) {
         child.castShadow = castShadow;
         child.receiveShadow = receiveShadow;

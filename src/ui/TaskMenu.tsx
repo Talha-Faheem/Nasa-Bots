@@ -9,6 +9,20 @@ import { useGameStore } from '../store/store.ts';
 import { CrewId, CropType } from '../sim/types.ts';
 import { getCrewDisplayName } from '../sim/rules/crew.ts';
 import { eventBus } from '../store/bus.ts';
+import {
+  Wrench,
+  Zap,
+  Move,
+  Activity,
+  Settings,
+  Sprout,
+  Shield,
+  Truck,
+  FlaskConical,
+  Radio,
+  AlertTriangle,
+  Info,
+} from './icons.tsx';
 
 export const TaskMenu: React.FC = () => {
   const buildingId = useGameStore((s) => s.taskTargetBuilding);
@@ -89,7 +103,7 @@ export const TaskMenu: React.FC = () => {
         <div className="flex items-center justify-between border-b border-[#26374D] pb-3 mb-4">
           <div>
             <h2 className="text-base font-bold text-white uppercase tracking-wider flex items-center gap-2">
-              <span>🛠️</span> {buildingId.replace('_', ' ')} Operations
+              <Wrench className="w-4 h-4 text-[#25C5F4]" /> {buildingId.replace('_', ' ')} Operations
             </h2>
             <p className="text-xs text-[#94A3B8]">
               Select an astronaut and assign a mission task. Review resource costs below.
@@ -147,7 +161,7 @@ export const TaskMenu: React.FC = () => {
                   <div className="w-full">
                     <div className="text-xs font-bold text-white flex items-center justify-center gap-1">
                       <span>{info.shortName}</span>
-                      {isEngineer && <span title="Systems Engineer (Fast Repairs)">⚡</span>}
+                      {isEngineer && <Zap className="w-3 h-3 text-[#25C5F4]" />}
                     </div>
                     <div className={`text-[10px] font-bold border rounded px-1 py-0.5 mt-1 truncate ${roleBadgeColor}`}>
                       {info.roleShort}
@@ -172,7 +186,7 @@ export const TaskMenu: React.FC = () => {
           <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
             <div>
               <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>🚶</span> Relocate Astronaut to Module
+                <Move className="w-3.5 h-3.5 text-[#25C5F4]" /> Relocate Astronaut to Module
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">
                 Takes travel ticks based on base grid distance.
@@ -197,7 +211,7 @@ export const TaskMenu: React.FC = () => {
           <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
             <div>
               <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>🔍</span> Diagnostic Inspection (2h)
+                <Activity className="w-3.5 h-3.5 text-[#25C5F4]" /> Diagnostic Inspection (2h)
               </div>
               <div className="text-[11px] text-slate-400 mt-0.5">
                 Cost: 2h stamina · 0 power · 0 parts
@@ -226,15 +240,16 @@ export const TaskMenu: React.FC = () => {
               <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
                 <div>
                   <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <span>🔧</span> Minor Repair (+30 condition)
+                    <Wrench className="w-3.5 h-3.5 text-[#22C55E]" /> Minor Repair (+30 condition)
                   </div>
                   <div className="text-[11px] text-slate-400 mt-0.5">
                     Cost: <strong className="text-sky-300">{minorRepairHours}h</strong> stamina · 0
                     power · <strong className="text-amber-300">1 part</strong>
                   </div>
                   {preview.overtimeWarning && (
-                    <div className="text-[10px] text-amber-400">
-                      ⚠️ Will exceed daily stamina (-3 health penalty)
+                    <div className="text-[10px] text-amber-400 flex items-center gap-1 mt-0.5">
+                      <AlertTriangle className="w-3 h-3 text-[#F59E0B]" />
+                      <span>Will exceed daily stamina (-3 health penalty)</span>
                     </div>
                   )}
                 </div>
@@ -268,7 +283,7 @@ export const TaskMenu: React.FC = () => {
               <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-between">
                 <div>
                   <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                    <span>⚙️</span> Major Overhaul (+60 condition & clear fault)
+                    <Settings className="w-3.5 h-3.5 text-[#F59E0B]" /> Major Overhaul (+60 condition & clear fault)
                   </div>
                   <div className="text-[11px] text-slate-400 mt-0.5">
                     Cost: <strong className="text-sky-300">{majorRepairHours}h</strong> ·{' '}
@@ -302,8 +317,8 @@ export const TaskMenu: React.FC = () => {
           {/* Building-Specific: Greenhouse Operations */}
           {buildingId === 'greenhouse' && (
             <div className="p-3 rounded-xl bg-slate-950 border border-emerald-900/60 space-y-2">
-              <div className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                <span>🌱</span> Hydroponic Crop Planting & Harvesting
+              <div className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <Sprout className="w-4 h-4 text-[#22C55E]" /> Hydroponic Crop Planting & Harvesting
               </div>
 
               <div className="flex gap-2">
@@ -371,7 +386,7 @@ export const TaskMenu: React.FC = () => {
             <div className="p-3 rounded-xl bg-slate-950 border border-amber-900/60 flex items-center justify-between">
               <div>
                 <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                  <span>🛡️</span> Build Regolith Shield Layer (+10 Protection)
+                  <Shield className="w-4 h-4 text-[#F59E0B]" /> Build Regolith Shield Layer (+10 Protection)
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
                   Cost: 10 crew hours · 8 power · 1 part (Built:{' '}
@@ -406,7 +421,7 @@ export const TaskMenu: React.FC = () => {
             <div className="p-3 rounded-xl bg-slate-950 border border-amber-800/60 flex items-center justify-between">
               <div>
                 <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                  <span>🚜</span> Crater Volatiles Sampling Trip (6h)
+                  <Truck className="w-4 h-4 text-[#F59E0B]" /> Crater Volatiles Sampling Trip (6h)
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
                   Cost: 6h (2 crew) · 20 power · -10 rover wear (+15 science)
@@ -444,7 +459,7 @@ export const TaskMenu: React.FC = () => {
             <div className="p-3 rounded-xl bg-slate-950 border border-violet-900/60 flex items-center justify-between">
               <div>
                 <div className="text-xs font-bold text-violet-300 flex items-center gap-1.5">
-                  <span>🔬</span> Run 3-Day Scientific Experiment
+                  <FlaskConical className="w-4 h-4 text-violet-400" /> Run 3-Day Scientific Experiment
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
                   Cost: 4 crew hours · 15 power/day for 3 days (+10 science)
@@ -472,7 +487,7 @@ export const TaskMenu: React.FC = () => {
             <div className="p-3 rounded-xl bg-slate-950 border border-sky-900/60 flex items-center justify-between">
               <div>
                 <div className="text-xs font-bold text-sky-300 flex items-center gap-1.5">
-                  <span>📡</span> Inquire Mission Control Advice
+                  <Radio className="w-4 h-4 text-[#25C5F4]" /> Inquire Mission Control Advice
                 </div>
                 <div className="text-[11px] text-slate-400 mt-0.5">
                   Cost: 1 crew hour · 5 power (+2 science telemetry)
@@ -499,7 +514,7 @@ export const TaskMenu: React.FC = () => {
         {/* Footer Dismiss Button */}
         <div className="mt-4 pt-3 border-t border-[#26374D] flex items-center justify-between">
           <div className="text-[11px] text-[#94A3B8] flex items-center gap-1.5 font-mono">
-            <span>💡</span> Press <kbd className="px-1.5 py-0.5 rounded bg-[#101A29] border border-[#26374D] text-[#25C5F4] text-[10px]">ESC</kbd> or click ✕ to close
+            <Info className="w-3.5 h-3.5 text-[#25C5F4]" /> Press <kbd className="px-1.5 py-0.5 rounded bg-[#101A29] border border-[#26374D] text-[#25C5F4] text-[10px]">ESC</kbd> or click ✕ to close
           </div>
           <button
             onClick={(e) => {

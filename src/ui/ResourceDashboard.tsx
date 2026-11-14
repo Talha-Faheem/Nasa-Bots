@@ -1,13 +1,23 @@
 /**
  * LUNAR FRONTIER: THE LAST 30 DAYS
  * src/ui/ResourceDashboard.tsx
- * Compact Resource Monitoring Panel (Area B).
- * Sleek, high-density telemetry strip with interactive deep-dive inspection.
+ * Professional Game Resource Telemetry Bar.
+ * Clean, compact horizontal row displaying Power, Oxygen, Water, Food, Health, Radiation, Comms.
+ * With professional SVG icons, current values, consumption/production trends, and clear warning states.
  */
 
 import React from 'react';
 import { useGameStore } from '../store/store.ts';
 import { eventBus } from '../store/bus.ts';
+import {
+  Zap,
+  Wind,
+  Droplets,
+  Wheat,
+  HeartPulse,
+  Radiation,
+  Radio,
+} from './icons.tsx';
 
 export const ResourceDashboard: React.FC = () => {
   const resources = useGameStore((s) => s.state.resources);
@@ -39,73 +49,80 @@ export const ResourceDashboard: React.FC = () => {
   const items = [
     {
       id: 'battery' as const,
-      icon: '⚡',
+      icon: Zap,
+      iconColor: '#38bdf8',
       name: 'Power',
       value: `${Math.round(resources.battery)}%`,
       trend: `${batteryDelta >= 0 ? '+' : ''}${batteryDelta}/d`,
       percent: resources.battery,
-      status: resources.battery < 20 ? 'critical' : resources.battery < 45 ? 'warning' : 'nominal',
-      statusColor: resources.battery < 20 ? '#EF4444' : resources.battery < 45 ? '#F59E0B' : '#25C5F4',
+      isWarning: resources.battery < 45,
+      isCritical: resources.battery < 20,
     },
     {
       id: 'oxygen' as const,
-      icon: '🫁',
+      icon: Wind,
+      iconColor: '#22c55e',
       name: 'Oxygen',
       value: `${Math.round(resources.oxygen)}%`,
-      trend: `${oxygenDaysLeft}d`,
+      trend: `${oxygenDaysLeft}d left`,
       percent: resources.oxygen,
-      status: resources.oxygen < 20 ? 'critical' : resources.oxygen < 40 ? 'warning' : 'nominal',
-      statusColor: resources.oxygen < 20 ? '#EF4444' : resources.oxygen < 40 ? '#F59E0B' : '#22C55E',
+      isWarning: resources.oxygen < 40,
+      isCritical: resources.oxygen < 20,
     },
     {
       id: 'water' as const,
-      icon: '💧',
+      icon: Droplets,
+      iconColor: '#38bdf8',
       name: 'Water',
       value: `${Math.round(resources.water)}%`,
-      trend: `${waterDaysLeft}d`,
+      trend: `${waterDaysLeft}d left`,
       percent: resources.water,
-      status: resources.water < 20 ? 'critical' : resources.water < 40 ? 'warning' : 'nominal',
-      statusColor: resources.water < 20 ? '#EF4444' : resources.water < 40 ? '#F59E0B' : '#25C5F4',
+      isWarning: resources.water < 40,
+      isCritical: resources.water < 20,
     },
     {
       id: 'food' as const,
-      icon: '🥗',
+      icon: Wheat,
+      iconColor: '#22c55e',
       name: 'Food',
       value: `${Math.round(resources.food)}%`,
-      trend: `${foodDaysLeft}d`,
+      trend: `${foodDaysLeft}d left`,
       percent: resources.food,
-      status: resources.food < 20 ? 'critical' : resources.food < 40 ? 'warning' : 'nominal',
-      statusColor: resources.food < 20 ? '#EF4444' : resources.food < 40 ? '#F59E0B' : '#22C55E',
+      isWarning: resources.food < 40,
+      isCritical: resources.food < 20,
     },
     {
       id: 'health' as const,
-      icon: '❤️',
+      icon: HeartPulse,
+      iconColor: '#ec4899',
       name: 'Crew Health',
       value: `${avgHealth}%`,
       trend: `min ${minHealth}%`,
       percent: avgHealth,
-      status: minHealth < 40 ? 'critical' : minHealth < 70 ? 'warning' : 'nominal',
-      statusColor: minHealth < 40 ? '#EF4444' : minHealth < 70 ? '#F59E0B' : '#22C55E',
+      isWarning: minHealth < 70,
+      isCritical: minHealth < 40,
     },
     {
       id: 'radiation' as const,
-      icon: '🛡️',
+      icon: Radiation,
+      iconColor: '#f59e0b',
       name: 'Radiation',
       value: `${totalExposure} pts`,
-      trend: totalExposure >= 60 ? 'HIGH' : totalExposure >= 30 ? 'MOD' : 'SAFE',
+      trend: totalExposure >= 60 ? 'HIGH' : totalExposure >= 30 ? 'MODERATE' : 'NOMINAL',
       percent: Math.min(100, (totalExposure / 100) * 100),
-      status: totalExposure >= 60 ? 'critical' : totalExposure >= 30 ? 'warning' : 'nominal',
-      statusColor: totalExposure >= 60 ? '#EF4444' : totalExposure >= 30 ? '#F59E0B' : '#22C55E',
+      isWarning: totalExposure >= 30,
+      isCritical: totalExposure >= 60,
     },
     {
       id: 'comms' as const,
-      icon: '📡',
+      icon: Radio,
+      iconColor: '#38bdf8',
       name: 'Comms',
       value: `${systems.comms.condition}%`,
-      trend: systems.comms.isFaulted ? 'OFFLINE' : 'ONLINE',
+      trend: systems.comms.isFaulted ? 'FAULT' : 'ONLINE',
       percent: systems.comms.condition,
-      status: systems.comms.isFaulted || systems.comms.condition < 25 ? 'critical' : systems.comms.condition < 60 ? 'warning' : 'nominal',
-      statusColor: systems.comms.isFaulted || systems.comms.condition < 25 ? '#EF4444' : systems.comms.condition < 60 ? '#F59E0B' : '#25C5F4',
+      isWarning: systems.comms.condition < 60,
+      isCritical: systems.comms.isFaulted || systems.comms.condition < 25,
     },
   ];
 
@@ -119,39 +136,52 @@ export const ResourceDashboard: React.FC = () => {
   };
 
   return (
-    <div className="h-9 bg-[#101A29]/95 border-b border-[#26374D] px-4 flex items-center justify-between gap-1.5 select-none z-20 backdrop-blur-md shadow-md pointer-events-auto">
+    <div className="h-9 bg-[#0b1322]/95 border-b border-[#26374D] px-4 flex items-center justify-between gap-1.5 select-none z-20 backdrop-blur-md shadow-md pointer-events-auto">
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar w-full">
         {items.map((item) => {
           const isSelected = selectedEntity?.type === 'resource' && selectedEntity.id === item.id;
+          const Icon = item.icon;
+
           return (
             <button
               key={item.id}
               onClick={() => handleSelectResource(item.id)}
-              className={`flex-1 min-w-[125px] max-w-[175px] h-7 px-2 rounded-md flex items-center justify-between gap-1.5 transition-all cursor-pointer border ${
+              className={`flex-1 min-w-[125px] max-w-[175px] h-7 px-2 rounded flex items-center justify-between gap-1.5 transition-all cursor-pointer border ${
                 isSelected
-                  ? 'bg-[#152235] border-[#25C5F4] shadow-[0_0_8px_rgba(37,197,244,0.2)]'
+                  ? 'bg-[#152235] border-[#25C5F4] shadow-[0_0_8px_rgba(37,197,244,0.25)]'
+                  : item.isCritical
+                  ? 'bg-[#ef4444]/15 border-[#ef4444]/60 hover:bg-[#ef4444]/25'
+                  : item.isWarning
+                  ? 'bg-[#f59e0b]/10 border-[#f59e0b]/50 hover:bg-[#f59e0b]/20'
                   : 'bg-[#080F1B]/60 border-[#26374D]/80 hover:border-[#25C5F4]/60 hover:bg-[#152235]/60'
               }`}
-              title={`Inspect ${item.name} Telemetry & Physics Breakdown`}
+              title={`Inspect ${item.name} Breakdown`}
             >
               {/* Icon & Name */}
               <div className="flex items-center gap-1.5 truncate">
-                <span className="text-xs leading-none">{item.icon}</span>
+                <Icon
+                  className="w-3.5 h-3.5 shrink-0"
+                  style={{ color: item.isCritical ? '#ef4444' : item.isWarning ? '#f59e0b' : item.iconColor }}
+                />
                 <span className="text-[11px] font-semibold text-[#94A3B8] truncate leading-none">
                   {item.name}
                 </span>
               </div>
 
-              {/* Value & Micro Trend */}
-              <div className="flex items-center gap-1.5 shrink-0 font-mono leading-none">
-                <span className="text-xs font-black text-[#F1F5F9]">{item.value}</span>
+              {/* Value & Trend */}
+              <div className="flex items-baseline gap-1 text-right shrink-0">
                 <span
-                  className="text-[9px] font-semibold px-1 py-0.2 rounded"
-                  style={{
-                    color: item.statusColor,
-                    backgroundColor: `${item.statusColor}1A`,
-                  }}
+                  className={`text-xs font-mono font-bold leading-none ${
+                    item.isCritical
+                      ? 'text-[#ef4444]'
+                      : item.isWarning
+                      ? 'text-[#f59e0b]'
+                      : 'text-[#F1F5F9]'
+                  }`}
                 >
+                  {item.value}
+                </span>
+                <span className="text-[9px] font-mono text-[#64748b] leading-none">
                   {item.trend}
                 </span>
               </div>

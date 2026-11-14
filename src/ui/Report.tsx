@@ -6,6 +6,15 @@
 
 import React from 'react';
 import { useGameStore } from '../store/store.ts';
+import {
+  Trophy,
+  FlaskConical,
+  AlertTriangle,
+  Compass,
+  Shield,
+  Radio,
+  RotateCcw,
+} from './icons.tsx';
 
 export const ReportModal: React.FC = () => {
   const state = useGameStore((s) => s.state);
@@ -18,18 +27,38 @@ export const ReportModal: React.FC = () => {
   if (status === 'in_progress') return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="bg-slate-900 border-2 border-sky-500/80 rounded-2xl max-w-2xl w-full p-6 shadow-2xl text-slate-200 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-4 select-none">
+      <div className="bg-slate-900 border-2 border-sky-500/80 rounded-2xl max-w-2xl w-full p-6 shadow-2xl text-slate-200 max-h-[90vh] overflow-y-auto animate-fadeIn">
         {/* Header */}
         <div className="text-center pb-4 border-b border-slate-800">
-          <div className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-950 text-sky-300 border border-sky-600 mb-2">
+          <div className="inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-950 text-sky-300 border border-sky-600 mb-2 font-mono">
             Mission Debriefing · NASA Space Apps Junior Trainer
           </div>
-          <h1 className="text-2xl font-black text-white">
-            {status === 'mission_accomplished' && '🏆 Mission Accomplished!'}
-            {status === 'scientific_success_resource_failure' && '🔬 Scientific Breakthrough / Resource Strain'}
-            {status === 'emergency_mission' && '⚠️ Expedition Complete (Survival Mission)'}
-            {status === 'mission_abort' && '🚀 Precautionary Mission Abort & Evacuation'}
+          <h1 className="text-2xl font-black text-white flex items-center justify-center gap-2">
+            {status === 'mission_accomplished' && (
+              <>
+                <Trophy className="w-6 h-6 text-[#f59e0b]" />
+                <span>Mission Accomplished!</span>
+              </>
+            )}
+            {status === 'scientific_success_resource_failure' && (
+              <>
+                <FlaskConical className="w-6 h-6 text-[#38bdf8]" />
+                <span>Scientific Breakthrough / Resource Strain</span>
+              </>
+            )}
+            {status === 'emergency_mission' && (
+              <>
+                <AlertTriangle className="w-6 h-6 text-[#f59e0b]" />
+                <span>Expedition Complete (Survival Mission)</span>
+              </>
+            )}
+            {status === 'mission_abort' && (
+              <>
+                <Compass className="w-6 h-6 text-[#ef4444]" />
+                <span>Precautionary Mission Abort & Evacuation</span>
+              </>
+            )}
           </h1>
           <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
             {state.mission.endingReason ?? '30-day lunar surface expedition concluded.'}
@@ -71,11 +100,14 @@ export const ReportModal: React.FC = () => {
 
         {/* Safety Gate Warning if Triggered */}
         {score?.safetyGateTriggered && (
-          <div className="p-3.5 rounded-xl bg-red-950/70 border border-red-500 mb-4 text-xs text-red-200">
-            <strong>🛡️ NASA Safety Gate Activated:</strong> In human spaceflight, crew safety
-            supersedes research. Because an astronaut sustained red radiation exposure or final
-            health fell below safe thresholds, science points counted as zero and the maximum rank was
-            restricted to Bronze.
+          <div className="p-3.5 rounded-xl bg-red-950/70 border border-red-500 mb-4 text-xs text-red-200 flex items-start gap-2">
+            <Shield className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
+            <div>
+              <strong>NASA Safety Gate Activated:</strong> In human spaceflight, crew safety
+              supersedes research. Because an astronaut sustained red radiation exposure or final
+              health fell below safe thresholds, science points counted as zero and the maximum rank was
+              restricted to Bronze.
+            </div>
           </div>
         )}
 
@@ -164,8 +196,9 @@ export const ReportModal: React.FC = () => {
 
         {/* Real-World Science Comparison */}
         <div className="bg-slate-950 border border-slate-800 rounded-xl p-3.5 mb-5 text-xs text-slate-300">
-          <div className="text-[11px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center gap-1">
-            <span>🛰️</span> Real-World NASA Comparison:
+          <div className="text-[11px] font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center gap-1.5 font-mono">
+            <Radio className="w-3.5 h-3.5 text-[#38bdf8]" />
+            <span>Real-World NASA Comparison:</span>
           </div>
           <p>
             During your mission, the base faced an X-class solar flare advisory based on real NASA DONKI
@@ -178,7 +211,7 @@ export const ReportModal: React.FC = () => {
         {/* Decision History */}
         {state.stats.decisionsMade.length > 0 && (
           <div className="mb-5">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-2 font-mono">
               Decision Timeline:
             </span>
             <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1 text-xs">
@@ -203,18 +236,20 @@ export const ReportModal: React.FC = () => {
               restartMission(state.mission.seed);
               setModal('none');
             }}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors"
+            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            🔄 Try Again with This Seed ({state.mission.seed})
+            <RotateCcw className="w-3.5 h-3.5" />
+            <span>Try Again (#{state.mission.seed})</span>
           </button>
           <button
             onClick={() => {
               restartMission();
               setModal('none');
             }}
-            className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-lg transition-transform hover:scale-105"
+            className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold shadow-lg transition-transform hover:scale-105 flex items-center gap-1.5 cursor-pointer"
           >
-            🚀 Launch New Expedition
+            <Compass className="w-3.5 h-3.5" />
+            <span>Launch New Expedition</span>
           </button>
         </div>
       </div>

@@ -15,6 +15,16 @@ import { BuildingId, CrewId } from '../sim/types.ts';
 import { getCrewDisplayName } from '../sim/rules/crew.ts';
 import { getUpgradesForBuilding } from '../sim/rules/upgrades.ts';
 import { eventBus } from '../store/bus.ts';
+import {
+  BUILDING_ICONS,
+  RESOURCE_ICONS,
+  AstronautPortrait,
+  Wrench,
+  Settings,
+  Activity,
+  Truck,
+  Compass,
+} from './icons.tsx';
 
 export const ContextPanel: React.FC = () => {
   const selectedEntity = useGameStore((s) => s.selectedEntity);
@@ -111,9 +121,14 @@ export const ContextPanel: React.FC = () => {
         {/* Header */}
         <div className="px-3.5 py-2.5 border-b border-[#26374D] bg-[#101A29] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg">
-              {bid === 'habitat' ? '🏠' : bid === 'power_station' ? '⚡' : bid === 'greenhouse' ? '🌱' : bid === 'recycler' ? '💧' : bid === 'shelter' ? '☢️' : bid === 'laboratory' ? '🔬' : bid === 'comms' ? '📡' : '🚜'}
-            </span>
+            {(() => {
+              const BIcon = BUILDING_ICONS[bid] || BUILDING_ICONS.habitat;
+              return (
+                <div className="p-1.5 rounded bg-[#152235] text-[#25C5F4]">
+                  <BIcon className="w-4 h-4" />
+                </div>
+              );
+            })()}
             <div>
               <h3 className="text-xs font-bold uppercase tracking-wider text-white">
                 {bid.replace('_', ' ')}
@@ -197,7 +212,7 @@ export const ContextPanel: React.FC = () => {
                 onClick={() => openTaskMenu(bid)}
                 className="w-full py-2 rounded-lg bg-[#25C5F4] hover:bg-[#25C5F4]/80 text-[#080F1B] text-xs font-black transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
               >
-                <span>🛠️</span>
+                <Wrench className="w-4 h-4 text-[#080F1B]" />
                 <span>OPERATE MODULE TASKS</span>
               </button>
             </div>
@@ -239,7 +254,9 @@ export const ContextPanel: React.FC = () => {
               {/* Quick Diagnostic */}
               <div className="p-2 rounded-lg bg-[#101A29] border border-[#26374D] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-white text-[11px]">🔍 Diagnostic Inspection</div>
+                  <div className="font-bold text-white text-[11px] flex items-center gap-1">
+                    <Activity className="w-3.5 h-3.5 text-[#25C5F4]" /> Diagnostic Inspection
+                  </div>
                   <div className="text-[10px] text-[#94A3B8]">Cost: 2h stamina • 0 parts</div>
                 </div>
                 <button
@@ -260,7 +277,9 @@ export const ContextPanel: React.FC = () => {
               {/* Quick Minor Repair */}
               <div className="p-2 rounded-lg bg-[#101A29] border border-[#26374D] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-white text-[11px]">🔧 Minor Repair (+30)</div>
+                  <div className="font-bold text-white text-[11px] flex items-center gap-1">
+                    <Wrench className="w-3.5 h-3.5 text-[#22C55E]" /> Minor Repair (+30)
+                  </div>
                   <div className="text-[10px] text-[#94A3B8]">Cost: {minorHours}h stamina • 1 part</div>
                 </div>
                 <button
@@ -282,7 +301,9 @@ export const ContextPanel: React.FC = () => {
               {/* Quick Overhaul */}
               <div className="p-2 rounded-lg bg-[#101A29] border border-[#26374D] flex items-center justify-between">
                 <div>
-                  <div className="font-bold text-white text-[11px]">⚙️ Major Overhaul (+60)</div>
+                  <div className="font-bold text-white text-[11px] flex items-center gap-1">
+                    <Settings className="w-3.5 h-3.5 text-[#F59E0B]" /> Major Overhaul (+60)
+                  </div>
                   <div className="text-[10px] text-[#94A3B8]">Cost: {majorHours}h • 2 parts • 5 power</div>
                 </div>
                 <button
@@ -350,10 +371,8 @@ export const ContextPanel: React.FC = () => {
       <div className="absolute right-3 top-24 bottom-20 w-84 bg-[#080F1B]/95 border border-[#26374D] rounded-xl shadow-2xl backdrop-blur-xl z-20 flex flex-col overflow-hidden text-[#F1F5F9] select-none pointer-events-auto animate-fadeIn">
         {/* Header */}
         <div className="px-3.5 py-2.5 border-b border-[#26374D] bg-[#101A29] flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-md bg-[#152235] border border-[#25C5F4]/40 flex items-center justify-center text-sm">
-              👨‍🚀
-            </div>
+          <div className="flex items-center gap-2.5">
+            <AstronautPortrait crewId={member.id} size={32} isActive={isPlayerActive} />
             <div>
               <h3 className="text-xs font-bold text-white">{member.name}</h3>
               <div className="text-[10px] text-[#25C5F4] font-mono">{info.role}</div>
@@ -388,7 +407,7 @@ export const ContextPanel: React.FC = () => {
             <div className="text-xs font-bold text-white">
               {isWorking ? `${member.currentTask?.type.replace('_', ' ')} at ${member.currentTask?.buildingId}` : 'Off Duty / Idle at Workstation'}
             </div>
-            <div className="text-[10px] text-[#94A3B8] font-mono">Location: 📍 {member.location}</div>
+            <div className="text-[10px] text-[#94A3B8] font-mono">Location: {member.location}</div>
           </div>
 
           {/* Specialized Ability */}
@@ -403,7 +422,7 @@ export const ContextPanel: React.FC = () => {
               onClick={() => setActivePlayerCrew(member.id)}
               className="w-full py-2 rounded-lg bg-[#25C5F4] hover:bg-[#25C5F4]/80 text-[#080F1B] text-xs font-bold transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <span>🎮</span>
+              <Compass className="w-4 h-4 text-[#080F1B]" />
               <span>TAKE DIRECT PHYSICAL CONTROL</span>
             </button>
           ) : (
@@ -448,15 +467,14 @@ export const ContextPanel: React.FC = () => {
     const systems = state.systems;
 
     let title = 'Resource Telemetry';
-    let icon = '⚡';
     let currentValue = '';
     let rateText = '';
     let physicsExplanation = '';
     let recommendation = '';
+    const ResIcon = RESOURCE_ICONS[rid] || RESOURCE_ICONS.battery;
 
     if (rid === 'battery') {
       title = 'Electrical Power Subsystem (EPS)';
-      icon = '⚡';
       currentValue = `${Math.round(resources.battery)} / 100 kWh Buffer`;
       rateText = `${Math.round(power.generationPerDay)} kWh Gen vs ${Math.round(power.totalDemandPerDay)} kWh Demand`;
       physicsExplanation =
@@ -465,7 +483,6 @@ export const ContextPanel: React.FC = () => {
         'Maintain solar panels above 50% condition. Turn off non-essential systems (e.g. greenhouse boost) during low-sun periods.';
     } else if (rid === 'oxygen') {
       title = 'Atmospheric Life Support (ECLSS)';
-      icon = '🫁';
       currentValue = `${Math.round(resources.oxygen)} / 100 kg O₂`;
       rateText = 'Baseline consumption: 6.0 kg/day (4 crew members)';
       physicsExplanation =
@@ -474,7 +491,6 @@ export const ContextPanel: React.FC = () => {
         'Keep Life Support condition above 40% to prevent rapid atmospheric leaks and hypoxia penalties.';
     } else if (rid === 'water') {
       title = 'Water Recovery Subsystem (WRS)';
-      icon = '💧';
       currentValue = `${Math.round(resources.water)} / 100 Liters H₂O`;
       rateText = '4.0 L/day crew baseline + 2.0 L/day per active crop bed';
       physicsExplanation =
@@ -483,7 +499,6 @@ export const ContextPanel: React.FC = () => {
         'Conduct Rover expeditions to South Pole water-ice craters (e.g. Haworth or Shackleton) to haul supplemental water.';
     } else if (rid === 'food') {
       title = 'Biomass & Nutrition Subsystem';
-      icon = '🥗';
       currentValue = `${Math.round(resources.food)} / 100 Rations`;
       rateText = 'Consumption: 3.5 rations/day (4 crew members)';
       physicsExplanation =
@@ -492,7 +507,6 @@ export const ContextPanel: React.FC = () => {
         'Plant Quick Greens for fast 5-day yields, or Soybeans for large 30-ration yields.';
     } else if (rid === 'health') {
       title = 'Crew Physiological Telemetry';
-      icon = '❤️';
       currentValue = `${Math.round(Object.values(state.crew).reduce((a, c) => a + c.health, 0) / 4)}% Mean Health`;
       rateText = 'Recovery: +2 HP/day when basic needs are satisfied (+1 extra with Dr. Maya Chen)';
       physicsExplanation =
@@ -501,16 +515,14 @@ export const ContextPanel: React.FC = () => {
         'Ensure astronauts have stamina to rest daily and do not skip exercise periods.';
     } else if (rid === 'radiation') {
       title = 'Space Radiation & Dosimetry';
-      icon = '🛡️';
       currentValue = `${state.resources.shieldProtection}% Passive Shielding (${state.resources.shieldLayersBuilt}/3 layers)`;
-      rateText = state.radiationAdvisory ? '⚠️ ACTIVE SOLAR PROTON EVENT (SPE)' : 'Nominal Background Galactic Cosmic Rays';
+      rateText = state.radiationAdvisory ? 'ACTIVE SOLAR PROTON EVENT (SPE)' : 'Nominal Background Galactic Cosmic Rays';
       physicsExplanation =
         'Without Earth’s magnetosphere, astronauts are exposed to galactic cosmic rays and sudden solar particle events (SPEs). Regolith shielding absorbs ionizing radiation.';
       recommendation =
         'During solar flare advisories, move all astronauts into the Radiation Shelter and construct sintered regolith layers.';
     } else if (rid === 'comms') {
       title = 'Deep Space Communication Network';
-      icon = '📡';
       currentValue = `${systems.comms.condition}% Signal Quality`;
       rateText = state.mission.siteId === 'mars' ? '6-Hour Time Delay' : '1.3-Second Speed of Light Delay';
       physicsExplanation =
@@ -524,7 +536,9 @@ export const ContextPanel: React.FC = () => {
         {/* Header */}
         <div className="px-3.5 py-2.5 border-b border-[#26374D] bg-[#101A29] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-base">{icon}</span>
+            <div className="p-1.5 rounded bg-[#152235] text-[#25C5F4]">
+              <ResIcon className="w-4 h-4" />
+            </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-white truncate max-w-[210px]">
               {title}
             </h3>
@@ -571,7 +585,9 @@ export const ContextPanel: React.FC = () => {
       <div className="absolute right-3 top-24 bottom-20 w-84 bg-[#080F1B]/95 border border-[#26374D] rounded-xl shadow-2xl backdrop-blur-xl z-20 flex flex-col overflow-hidden text-[#F1F5F9] select-none pointer-events-auto animate-fadeIn">
         <div className="px-3.5 py-2.5 border-b border-[#26374D] bg-[#101A29] flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-base">🚜</span>
+            <div className="p-1.5 rounded bg-[#152235] text-[#25C5F4]">
+              <Truck className="w-4 h-4" />
+            </div>
             <h3 className="text-xs font-bold uppercase tracking-wider text-white">
               Lunar Polar Exploration Rover
             </h3>

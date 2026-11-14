@@ -30,6 +30,8 @@ export const App: React.FC = () => {
   const appPhase = useGameStore((s) => s.appPhase);
   const activeModal = useGameStore((s) => s.activeModal);
   const setModal = useGameStore((s) => s.setModal);
+  const cameraMode = useGameStore((s) => s.cameraMode);
+  const setCameraMode = useGameStore((s) => s.setCameraMode);
   const cycleCameraMode = useGameStore((s) => s.cycleCameraMode);
   const toggleDebugOverlay = useGameStore((s) => s.toggleDebugOverlay);
 
@@ -50,9 +52,15 @@ export const App: React.FC = () => {
       }
 
       if (appPhase === 'in_game') {
-        // Escape or P triggers Pause Menu
-        if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+        // Escape: Exits FPV helmet view if active; otherwise toggles pause/closes modals
+        if (e.key === 'Escape') {
           e.preventDefault();
+          if (activeModal === 'none' && cameraMode === 'first_person') {
+            setCameraMode('commander');
+            if (document.exitPointerLock) document.exitPointerLock();
+            eventBus.emit('sound:play', { name: 'click' });
+            return;
+          }
           if (activeModal === 'none') {
             dispatch({ type: 'PAUSE' });
             setModal('pause');
@@ -63,6 +71,21 @@ export const App: React.FC = () => {
             eventBus.emit('sound:play', { name: 'click' });
           } else {
             // Close active modal
+            setModal('none');
+            eventBus.emit('sound:play', { name: 'click' });
+          }
+          return;
+        }
+
+        // P key explicitly toggles pause
+        if (e.key === 'p' || e.key === 'P') {
+          e.preventDefault();
+          if (activeModal === 'none') {
+            dispatch({ type: 'PAUSE' });
+            setModal('pause');
+            eventBus.emit('sound:play', { name: 'click' });
+          } else if (activeModal === 'pause') {
+            dispatch({ type: 'RESUME' });
             setModal('none');
             eventBus.emit('sound:play', { name: 'click' });
           }
@@ -91,7 +114,17 @@ export const App: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [dispatch, isPaused, appPhase, activeModal, setModal, cycleCameraMode, toggleDebugOverlay]);
+  }, [
+    dispatch,
+    isPaused,
+    appPhase,
+    activeModal,
+    setModal,
+    cameraMode,
+    setCameraMode,
+    cycleCameraMode,
+    toggleDebugOverlay,
+  ]);
 
   // Audio effects synthesizer using Web Audio API (reliable, zero external file dependency)
   useEffect(() => {

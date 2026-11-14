@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { useGameStore } from '../store/store.ts';
+import { BookOpen } from './icons.tsx';
 
 export const LearnCardModal: React.FC = () => {
   const activeModal = useGameStore((s) => s.activeModal);
@@ -19,7 +20,7 @@ export const LearnCardModal: React.FC = () => {
       <div className="bg-slate-900 border border-sky-500 rounded-2xl max-w-md w-full p-6 shadow-2xl text-slate-200">
         <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl">📘</span>
+            <BookOpen className="w-5 h-5 text-[#25C5F4]" />
             <h3 className="text-sm font-black text-white">{content.title}</h3>
           </div>
           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-sky-950 text-sky-300 border border-sky-600">

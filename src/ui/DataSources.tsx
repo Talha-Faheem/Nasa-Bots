@@ -6,6 +6,7 @@
 
 import React from 'react';
 import { useGameStore } from '../store/store.ts';
+import { Radio, Shield } from './icons.tsx';
 
 export const DataSourcesModal: React.FC = () => {
   const activeModal = useGameStore((s) => s.activeModal);
@@ -19,7 +20,7 @@ export const DataSourcesModal: React.FC = () => {
         <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
           <div>
             <h2 className="text-xl font-black text-white flex items-center gap-2">
-              <span>🛰️</span> NASA Open Data Sources & Attribution
+              <Radio className="w-5 h-5 text-[#25C5F4]" /> NASA Open Data Sources & Attribution
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
               Comprehensive transparency documentation for NASA Space Apps Challenge judges.
@@ -35,8 +36,8 @@ export const DataSourcesModal: React.FC = () => {
 
         {/* Core Honesty Disclaimer */}
         <div className="p-3.5 rounded-xl bg-sky-950/80 border border-sky-600 mb-5 text-xs text-sky-200">
-          <strong className="block text-sky-300 mb-1">
-            ⚖️ NASA Attribution & Scientific Integrity Policy:
+          <strong className="text-sky-300 mb-1 flex items-center gap-1.5">
+            <Shield className="w-4 h-4 text-[#25C5F4]" /> NASA Attribution & Scientific Integrity Policy:
           </strong>
           Every space-weather item carries an explicit badge: <strong>Live NASA</strong>,{' '}
           <strong>Archived NASA</strong>, or <strong>Simulated</strong>. Static data is never

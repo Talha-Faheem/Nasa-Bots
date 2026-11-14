@@ -20,8 +20,20 @@ import { ContextPanel } from './ContextPanel.tsx';
 import { AstronautRoster } from './AstronautRoster.tsx';
 import { NotificationTray } from './NotificationTray.tsx';
 import { InteractionPrompt } from './InteractionPrompt.tsx';
+import { useGameStore } from '../store/store.ts';
 
 export const Hud: React.FC = () => {
+  const cameraMode = useGameStore((s) => s.cameraMode);
+
+  // In first-person helmet view, suppress the 2D colony overview HUD in favor of the dedicated FPV visor overlay
+  if (cameraMode === 'first_person') {
+    return (
+      <div className="absolute inset-0 pointer-events-none select-none flex flex-col justify-between overflow-hidden z-10">
+        <NotificationTray />
+      </div>
+    );
+  }
+
   return (
     <div className="absolute inset-0 pointer-events-none select-none flex flex-col justify-between overflow-hidden z-10">
       {/* Top Mission Control Cluster (Area A & B) */}
