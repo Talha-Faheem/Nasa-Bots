@@ -191,6 +191,31 @@ export interface TaskCostPreview {
   missingReason?: string;
 }
 
+export type GeologicalResourceType =
+  | 'regolith'
+  | 'water_ice'
+  | 'iron'
+  | 'titanium'
+  | 'aluminum'
+  | 'silicon'
+  | 'he3';
+
+export interface ResourceDeposit {
+  id: string;
+  name: string;
+  resourceType: GeologicalResourceType;
+  zone: string;
+  position: { x: number; z: number };
+  elevation: number;
+  totalQuantity: number;
+  remainingQuantity: number;
+  depleted: boolean;
+  scanned: boolean;
+  difficulty: 'easy' | 'moderate' | 'challenging' | 'extreme';
+  requiredTool: string;
+  description: string;
+}
+
 export interface ResourcesState {
   battery: number; // 0-100, start 85
   oxygen: number; // 0-100, start 90
@@ -200,6 +225,21 @@ export interface ResourcesState {
   shieldLayersBuilt: number; // 0 to 3
   spareParts: number; // cadet 8, commander 6, veteran 4
   science: number; // start 0, max 100 in score
+
+  // Land Resources & Raw Geological Materials (Part 2 & 12)
+  rawRegolith?: number;
+  rawIce?: number;
+  ironOre?: number;
+  titaniumOre?: number;
+  aluminumOre?: number;
+  siliconOre?: number;
+  he3Volatiles?: number;
+
+  // Processed Construction & Industrial Materials (Part 5 & 12)
+  sinteredBlocks?: number;
+  metalComponents?: number;
+  solarCells?: number;
+  medicalSupplies?: number;
 }
 
 export interface PowerBreakdown {
@@ -442,6 +482,7 @@ export interface GameState {
   construction?: Record<ConstructionProjectId, { built: boolean; inProgress: boolean; progressTicks: number }>;
   objectives?: MissionObjective[];
   achievements?: Achievement[];
+  deposits?: Record<string, ResourceDeposit>;
 }
 
 // Commands from Player / UI / 3D Scene
@@ -463,6 +504,9 @@ export type Command =
       destinationId?: RoverDestinationId;
     }
   | { type: 'CANCEL_TASK'; crewId: CrewId }
+  | { type: 'SCAN_DEPOSIT'; crewId: CrewId; depositId: string }
+  | { type: 'MINE_DEPOSIT'; crewId: CrewId; depositId: string; amount?: number }
+  | { type: 'PROCESS_MATERIAL'; processType: 'ice_to_water' | 'regolith_to_blocks' | 'ore_to_metal' | 'silicon_to_cells'; batches?: number }
   | { type: 'SEND_TO_OFFICE'; crewId: CrewId }
   | { type: 'SEND_TO_REST'; crewId: CrewId }
   | { type: 'SET_CREW_STATUS'; crewId: CrewId; status: CrewStatus; activity?: string }

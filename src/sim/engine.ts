@@ -36,6 +36,7 @@ import { RESEARCH_PROJECTS } from './rules/research.ts';
 import { ROVER_DESTINATIONS } from './rules/rover.ts';
 import { CONSTRUCTION_PROJECTS } from './rules/construction.ts';
 import { createInitialObjectives, createInitialAchievements } from './rules/objectives.ts';
+import { createInitialDeposits, scanDeposit, mineDeposit, processMaterials } from './rules/geology.ts';
 
 export function createInitialState(
   seed: number,
@@ -74,6 +75,17 @@ export function createInitialState(
       shieldLayersBuilt: 0,
       spareParts,
       science: 0,
+      rawRegolith: 60,
+      rawIce: 0,
+      ironOre: 15,
+      titaniumOre: 8,
+      aluminumOre: 12,
+      siliconOre: 10,
+      he3Volatiles: 0,
+      sinteredBlocks: 16,
+      metalComponents: 10,
+      solarCells: 6,
+      medicalSupplies: 20,
     },
     systems: {
       solarArray: { condition: 100, isFaulted: false, name: 'Solar Array' },
@@ -170,6 +182,7 @@ export function createInitialState(
     },
     objectives: createInitialObjectives(),
     achievements: createInitialAchievements(),
+    deposits: createInitialDeposits(),
     commandLog: [],
     log: [
       {
@@ -628,6 +641,34 @@ export class SimulationEngine {
           type: 'info',
         });
         break;
+      }
+
+      case 'SCAN_DEPOSIT': {
+        const deposit = nextState.deposits?.[command.depositId];
+        const crew = nextState.crew[command.crewId];
+        if (deposit && crew && !deposit.scanned) {
+          const res = scanDeposit(deposit, crew);
+          nextState.deposits![command.depositId] = res.scannedDeposit;
+          nextState.resources.science = Math.min(100, nextState.resources.science + res.scienceGained);
+          nextState.log.push({
+            id: `scan_${command.depositId}_${nextState.mission.totalTicks}`,
+            day: nextState.mission.day,
+            tick: nextState.mission.tick,
+            message: `${crew.name} surveyed and scanned ${deposit.name} (+${res.scienceGained} Science).`,
+            type: 'info',
+          });
+        }
+        break;
+      }
+
+      case 'MINE_DEPOSIT': {
+        const res = mineDeposit(nextState, command.depositId, command.crewId, command.amount);
+        return res.nextState;
+      }
+
+      case 'PROCESS_MATERIAL': {
+        const res = processMaterials(nextState, command.processType, command.batches);
+        return res.nextState;
       }
     }
 

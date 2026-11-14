@@ -13,6 +13,7 @@ import { BUILDING_COORDINATES } from '../../sim/rules/crew.ts';
 import { useGameStore } from '../../store/store.ts';
 import { eventBus } from '../../store/bus.ts';
 import { GLTFModel } from '../ModelLoader.tsx';
+import { getTerrainHeight } from '../Physics/TerrainHeight.ts';
 
 interface BuildingProps {
   id: BuildingId;
@@ -90,7 +91,7 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
 
   return (
     <group
-      position={[coords.x, 0, coords.z]}
+      position={[coords.x, getTerrainHeight(coords.x, coords.z), coords.z]}
       onClick={(e) => {
         e.stopPropagation();
         setSelectedEntity({ type: 'building', id });

@@ -7,12 +7,13 @@
 
 import React from 'react';
 import { GLTFModel } from './ModelLoader.tsx';
+import { getTerrainHeight } from './Physics/TerrainHeight.ts';
 
 export const ColonyInfrastructure: React.FC = () => {
   return (
     <group>
       {/* 1. Artemis Landing Pad Complex (South of Base) */}
-      <group position={[0, 0, -32]}>
+      <group position={[0, getTerrainHeight(0, -32), -32]}>
         {/* Sintered Landing Pad Surface */}
         <GLTFModel
           url="/assets/models/buildings/landing_pad.glb"
@@ -61,7 +62,7 @@ export const ColonyInfrastructure: React.FC = () => {
       </group>
 
       {/* 2. In-Situ Regolith Mining & Sintering Facility (West of Base) */}
-      <group position={[-23, 0, 16]}>
+      <group position={[-23, getTerrainHeight(-23, 16), 16]}>
         {/* Regolith Bucket Drum Excavator */}
         <GLTFModel
           url="/assets/models/mining/regolith_excavator.glb"
@@ -97,7 +98,7 @@ export const ColonyInfrastructure: React.FC = () => {
         <GLTFModel
           url="/assets/models/tunnels/tunnel_straight.glb"
           scale={0.72}
-          position={[5.5, 0, -1.8]}
+          position={[5.5, getTerrainHeight(5.5, -1.8), -1.8]}
           rotation={[0, -0.32, 0]}
         />
 
@@ -105,7 +106,7 @@ export const ColonyInfrastructure: React.FC = () => {
         <GLTFModel
           url="/assets/models/tunnels/tunnel_straight.glb"
           scale={0.72}
-          position={[6.5, 0, 3.8]}
+          position={[6.5, getTerrainHeight(6.5, 3.8), 3.8]}
           rotation={[0, 0.52, 0]}
         />
 
@@ -113,7 +114,7 @@ export const ColonyInfrastructure: React.FC = () => {
         <GLTFModel
           url="/assets/models/tunnels/tunnel_straight.glb"
           scale={0.72}
-          position={[2.8, 0, 4.8]}
+          position={[2.8, getTerrainHeight(2.8, 4.8), 4.8]}
           rotation={[0, 1.05, 0]}
         />
 
@@ -121,7 +122,7 @@ export const ColonyInfrastructure: React.FC = () => {
         <GLTFModel
           url="/assets/models/buildings/blast_berm.glb"
           scale={0.8}
-          position={[-5, 0, 8]}
+          position={[-5, getTerrainHeight(-5, 8), 8]}
           rotation={[0, 0.6, 0]}
         />
       </group>
@@ -132,21 +133,21 @@ export const ColonyInfrastructure: React.FC = () => {
         <GLTFModel
           url="/assets/models/astronauts/tool_cart.glb"
           scale={0.8}
-          position={[2.2, 0, 2.0]}
+          position={[2.2, getTerrainHeight(2.2, 2.0), 2.0]}
           rotation={[0, 0.5, 0]}
         />
         {/* Heavy Equipment Sled near Rover Bay */}
         <GLTFModel
           url="/assets/models/astronauts/equipment_sled.glb"
           scale={0.85}
-          position={[-2.8, 0, -14.5]}
+          position={[-2.8, getTerrainHeight(-2.8, -14.5), -14.5]}
           rotation={[0, -0.4, 0]}
         />
         {/* Autonomous Survey Robot Rover near Solar Farm */}
         <GLTFModel
           url="/assets/models/rovers/rover_survey_robot.glb"
           scale={0.75}
-          position={[-11, 0, -8]}
+          position={[-11, getTerrainHeight(-11, -8), -8]}
           rotation={[0, 1.2, 0]}
         />
       </group>
@@ -157,19 +158,19 @@ export const ColonyInfrastructure: React.FC = () => {
         <GLTFModel
           url="/assets/models/environment/survey_marker_array.glb"
           scale={0.9}
-          position={[-9, 0, -17]}
+          position={[-9, getTerrainHeight(-9, -17), -17]}
         />
         {/* Natural Lunar Boulder Field */}
         <GLTFModel
           url="/assets/models/environment/boulder_field_tile.glb"
           scale={0.85}
-          position={[22, 0, -16]}
+          position={[22, getTerrainHeight(22, -16), -16]}
         />
         {/* Regolith Dust Berm Protective Enclosure */}
         <GLTFModel
           url="/assets/models/environment/graded_dust_berm.glb"
           scale={0.9}
-          position={[-15, 0, 3]}
+          position={[-15, getTerrainHeight(-15, 3), 3]}
           rotation={[0, 0.4, 0]}
         />
       </group>

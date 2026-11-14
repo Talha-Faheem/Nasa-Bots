@@ -35,6 +35,8 @@ export const LeftNavPanel: React.FC = () => {
   const state = useGameStore((s) => s.state);
   const dispatch = useGameStore((s) => s.dispatch);
 
+  const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
+  const openLearnCard = useGameStore((s) => s.openLearnCard);
   const toggleTab = (tab: ActiveNavTab) => {
     setActiveNavTab(activeNavTab === tab ? null : tab);
   };
@@ -449,32 +451,289 @@ export const LeftNavPanel: React.FC = () => {
 
             {/* TAB: INVENTORY & STORAGE */}
             {activeNavTab === 'inventory' && (
-              <div className="space-y-2">
+              <div className="space-y-3 font-sans">
+                {/* 1. In-Situ Material Refinery & Processing Skids */}
+                <div className="p-2.5 rounded-lg bg-[#101A29] border border-[#26374D]">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[10px] font-bold text-[#25C5F4] uppercase tracking-wider flex items-center gap-1.5">
+                      <span>⚗️</span> In-Situ Processing Refinery
+                    </span>
+                    <span className="text-[9px] font-mono text-[#94A3B8]">ISRU Plant</span>
+                  </div>
+                  <div className="space-y-2">
+                    {/* Recipe 1: Water Ice */}
+                    <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-white flex items-center gap-1">
+                          <span>❄️</span> Melt Cryogenic Ice
+                        </span>
+                        <span className="text-[10px] font-mono text-[#22C55E]">10kg Ice → 9L Water</span>
+                      </div>
+                      <div className="flex justify-between text-[10px] font-mono text-[#94A3B8]">
+                        <span>Avail: {(state.resources.rawIce || 0)} kg</span>
+                        <span>Cost: 3 kWh</span>
+                      </div>
+                      <button
+                        disabled={(state.resources.rawIce || 0) < 10 || state.resources.battery < 3}
+                        onClick={() => {
+                          dispatch({
+                            type: 'PROCESS_MATERIAL',
+                            processType: 'ice_to_water',
+                            batches: 1,
+                          });
+                          eventBus.emit('sound:play', { name: 'click' });
+                        }}
+                        className="py-1 rounded bg-[#25C5F4] hover:bg-[#25C5F4]/80 disabled:opacity-40 text-[#080F1B] text-[10px] font-bold transition-all cursor-pointer shadow"
+                      >
+                        Process 10kg Ice (9L Water)
+                      </button>
+                    </div>
+
+                    {/* Recipe 2: Regolith Sintering */}
+                    <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-white flex items-center gap-1">
+                          <span>🧱</span> Microwave Sinter Regolith
+                        </span>
+                        <span className="text-[10px] font-mono text-[#22C55E]">25kg Regolith → 2 Blocks</span>
+                      </div>
+                      <div className="flex justify-between text-[10px] font-mono text-[#94A3B8]">
+                        <span>Avail: {(state.resources.rawRegolith || 0)} kg</span>
+                        <span>Cost: 4 kWh</span>
+                      </div>
+                      <button
+                        disabled={(state.resources.rawRegolith || 0) < 25 || state.resources.battery < 4}
+                        onClick={() => {
+                          dispatch({
+                            type: 'PROCESS_MATERIAL',
+                            processType: 'regolith_to_blocks',
+                            batches: 1,
+                          });
+                          eventBus.emit('sound:play', { name: 'click' });
+                        }}
+                        className="py-1 rounded bg-[#F59E0B] hover:bg-[#F59E0B]/80 disabled:opacity-40 text-[#080F1B] text-[10px] font-bold transition-all cursor-pointer shadow"
+                      >
+                        Sinter 25kg Regolith (2 Blocks)
+                      </button>
+                    </div>
+
+                    {/* Recipe 3: Ore Smelting */}
+                    <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-white flex items-center gap-1">
+                          <span>⚙️</span> Smelt Ilmenite Ore
+                        </span>
+                        <span className="text-[10px] font-mono text-[#22C55E]">15kg Ore → 1 Part + 2 Comp</span>
+                      </div>
+                      <div className="flex justify-between text-[10px] font-mono text-[#94A3B8]">
+                        <span>Avail: {(state.resources.ironOre || 0)} kg</span>
+                        <span>Cost: 5 kWh</span>
+                      </div>
+                      <button
+                        disabled={(state.resources.ironOre || 0) < 15 || state.resources.battery < 5}
+                        onClick={() => {
+                          dispatch({
+                            type: 'PROCESS_MATERIAL',
+                            processType: 'ore_to_metal',
+                            batches: 1,
+                          });
+                          eventBus.emit('sound:play', { name: 'click' });
+                        }}
+                        className="py-1 rounded bg-[#E2E8F0] hover:bg-white disabled:opacity-40 text-[#080F1B] text-[10px] font-bold transition-all cursor-pointer shadow"
+                      >
+                        Smelt 15kg Ore (1 Part + 2 Metal)
+                      </button>
+                    </div>
+
+                    {/* Recipe 4: Silicon Solar Cells */}
+                    <div className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] flex flex-col gap-1.5">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-white flex items-center gap-1">
+                          <span>☀️</span> Fabricate Solar Cells
+                        </span>
+                        <span className="text-[10px] font-mono text-[#22C55E]">10kg Silicon → 1 Cell</span>
+                      </div>
+                      <div className="flex justify-between text-[10px] font-mono text-[#94A3B8]">
+                        <span>Avail: {(state.resources.siliconOre || 0)} kg</span>
+                        <span>Cost: 4 kWh</span>
+                      </div>
+                      <button
+                        disabled={(state.resources.siliconOre || 0) < 10 || state.resources.battery < 4}
+                        onClick={() => {
+                          dispatch({
+                            type: 'PROCESS_MATERIAL',
+                            processType: 'silicon_to_cells',
+                            batches: 1,
+                          });
+                          eventBus.emit('sound:play', { name: 'click' });
+                        }}
+                        className="py-1 rounded bg-[#38BDF8] hover:bg-[#38BDF8]/80 disabled:opacity-40 text-[#080F1B] text-[10px] font-bold transition-all cursor-pointer shadow"
+                      >
+                        Fabricate 1 Solar Cell
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Raw Geological Inventory */}
                 <div className="p-2.5 rounded-lg bg-[#101A29] border border-[#26374D]">
                   <div className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">
-                    Storage Reserves & Hardware Buffer
+                    Raw Geological Stocks (In-Situ)
+                  </div>
+                  <div className="grid grid-cols-2 gap-1.5 font-mono text-xs">
+                    <div className="p-1.5 rounded bg-[#0A111C] border border-[#1E2D42] flex justify-between">
+                      <span className="text-[#94A3B8]">Raw Ice:</span>
+                      <span className="text-[#38BDF8] font-bold">{(state.resources.rawIce || 0)} kg</span>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#0A111C] border border-[#1E2D42] flex justify-between">
+                      <span className="text-[#94A3B8]">Regolith:</span>
+                      <span className="text-[#F59E0B] font-bold">{(state.resources.rawRegolith || 0)} kg</span>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#0A111C] border border-[#1E2D42] flex justify-between">
+                      <span className="text-[#94A3B8]">Iron Ore:</span>
+                      <span className="text-[#EA580C] font-bold">{(state.resources.ironOre || 0)} kg</span>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#0A111C] border border-[#1E2D42] flex justify-between">
+                      <span className="text-[#94A3B8]">Titanium:</span>
+                      <span className="text-[#94A3B8] font-bold">{(state.resources.titaniumOre || 0)} kg</span>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#0A111C] border border-[#1E2D42] flex justify-between">
+                      <span className="text-[#94A3B8]">Aluminum:</span>
+                      <span className="text-[#CBD5E1] font-bold">{(state.resources.aluminumOre || 0)} kg</span>
+                    </div>
+                    <div className="p-1.5 rounded bg-[#0A111C] border border-[#1E2D42] flex justify-between">
+                      <span className="text-[#94A3B8]">Silicate:</span>
+                      <span className="text-[#60A5FA] font-bold">{(state.resources.siliconOre || 0)} kg</span>
+                    </div>
+                    <div className="col-span-2 p-1.5 rounded bg-[#0A111C] border border-[#1E2D42] flex justify-between">
+                      <span className="text-[#94A3B8]">He-3 Volatiles:</span>
+                      <span className="text-[#C084FC] font-bold">{(state.resources.he3Volatiles || 0)} kg</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Manufactured Colony Hardware */}
+                <div className="p-2.5 rounded-lg bg-[#101A29] border border-[#26374D]">
+                  <div className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">
+                    Manufactured Hardware & Life Support Buffer
                   </div>
                   <div className="space-y-1.5 font-mono text-xs">
+                    <div className="flex justify-between py-1 border-b border-[#26374D]">
+                      <span className="text-[#94A3B8]">Sintered Blocks:</span>
+                      <span className="text-white font-bold">{state.resources.sinteredBlocks || 0} units</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-[#26374D]">
+                      <span className="text-[#94A3B8]">Metal Components:</span>
+                      <span className="text-white font-bold">{state.resources.metalComponents || 0} units</span>
+                    </div>
+                    <div className="flex justify-between py-1 border-b border-[#26374D]">
+                      <span className="text-[#94A3B8]">Photovoltaic Cells:</span>
+                      <span className="text-white font-bold">{state.resources.solarCells || 0} units</span>
+                    </div>
                     <div className="flex justify-between py-1 border-b border-[#26374D]">
                       <span className="text-[#94A3B8]">Spare Parts:</span>
                       <span className="text-white font-bold">{state.resources.spareParts} units</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-[#26374D]">
-                      <span className="text-[#94A3B8]">Battery Buffer:</span>
-                      <span className="text-white font-bold">{Math.round(state.resources.battery)} / 100 kWh</span>
-                    </div>
-                    <div className="flex justify-between py-1 border-b border-[#26374D]">
-                      <span className="text-[#94A3B8]">Food Packets:</span>
-                      <span className="text-white font-bold">{Math.round(state.resources.food)} rations</span>
+                      <span className="text-[#94A3B8]">Medical Packs:</span>
+                      <span className="text-white font-bold">{state.resources.medicalSupplies || 0} kits</span>
                     </div>
                     <div className="flex justify-between py-1 border-b border-[#26374D]">
                       <span className="text-[#94A3B8]">Water Reservoir:</span>
-                      <span className="text-white font-bold">{Math.round(state.resources.water)} Liters</span>
+                      <span className="text-white font-bold">{Math.round(state.resources.water)} / 100 L</span>
                     </div>
                     <div className="flex justify-between py-1">
-                      <span className="text-[#94A3B8]">Oxygen Tanks:</span>
-                      <span className="text-white font-bold">{Math.round(state.resources.oxygen)} kg</span>
+                      <span className="text-[#94A3B8]">Oxygen Buffer:</span>
+                      <span className="text-white font-bold">{Math.round(state.resources.oxygen)} / 100 kg</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* 4. Geological Surface Field Deposits */}
+                <div className="p-2.5 rounded-lg bg-[#101A29] border border-[#26374D]">
+                  <div className="text-[10px] font-bold text-[#94A3B8] uppercase tracking-wider mb-2">
+                    Surface Geological Deposits ({Object.keys(state.deposits || {}).length} sites)
+                  </div>
+                  <div className="space-y-2">
+                    {Object.values(state.deposits || {}).map((dep) => (
+                      <div key={dep.id} className="p-2 rounded bg-[#0A111C] border border-[#1E2D42] text-xs">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-bold text-white truncate max-w-[170px]">{dep.name}</span>
+                          <span
+                            className={`px-1.5 py-0.5 rounded text-[8px] font-bold ${
+                              dep.depleted
+                                ? 'bg-red-500/20 text-red-400'
+                                : dep.scanned
+                                ? 'bg-[#22C55E]/20 text-[#22C55E]'
+                                : 'bg-amber-500/20 text-amber-400'
+                            }`}
+                          >
+                            {dep.depleted ? 'DEPLETED' : dep.scanned ? 'SCANNED' : 'UNSURVEYED'}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-[#94A3B8] mb-1">
+                          Zone: <span className="text-white">{dep.zone}</span> (X: {dep.position.x}, Z: {dep.position.z})
+                        </div>
+                        <div className="flex items-center justify-between text-[10px] font-mono mb-1.5">
+                          <span className="text-[#94A3B8]">Reserves:</span>
+                          <span className="text-[#25C5F4] font-bold">
+                            {dep.remainingQuantity} / {dep.totalQuantity} units
+                          </span>
+                        </div>
+                        <div className="flex gap-1">
+                          {!dep.scanned ? (
+                            <button
+                              onClick={() => {
+                                dispatch({
+                                  type: 'SCAN_DEPOSIT',
+                                  crewId: activePlayerCrew,
+                                  depositId: dep.id,
+                                });
+                                eventBus.emit('sound:play', { name: 'click' });
+                              }}
+                              className="flex-1 py-0.5 rounded bg-amber-500 hover:bg-amber-400 text-[#080F1B] font-bold text-[9px] transition-all cursor-pointer"
+                            >
+                              Scan Deposit (+Science)
+                            </button>
+                          ) : !dep.depleted ? (
+                            <button
+                              onClick={() => {
+                                dispatch({
+                                  type: 'MINE_DEPOSIT',
+                                  crewId: activePlayerCrew,
+                                  depositId: dep.id,
+                                  amount: 25,
+                                });
+                                eventBus.emit('sound:play', { name: 'click' });
+                              }}
+                              className="flex-1 py-0.5 rounded bg-[#22C55E] hover:bg-[#16A34A] text-[#080F1B] font-bold text-[9px] transition-all cursor-pointer"
+                            >
+                              Mine 25 units ({activePlayerCrew})
+                            </button>
+                          ) : (
+                            <span className="text-[9px] text-red-400 italic">Site Depleted</span>
+                          )}
+                          <button
+                            onClick={() => {
+                              openLearnCard({
+                                title: dep.name,
+                                threeLineSummary: [
+                                  dep.description,
+                                  `Zone: ${dep.zone}`,
+                                  `Extraction Tool: ${dep.requiredTool}`,
+                                ],
+                                scienceConcept: `Lunar In-Situ Resource Utilization (ISRU) unlocks sustainable exploration by extracting ${dep.resourceType} from local geological formations.`,
+                                sourceBadge: 'Live NASA',
+                                readMoreUrl: 'https://www.nasa.gov/mission/artemis/isru',
+                              });
+                            }}
+                            className="px-2 py-0.5 rounded bg-[#1E293B] hover:bg-[#334155] text-white text-[9px]"
+                          >
+                            Info
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>

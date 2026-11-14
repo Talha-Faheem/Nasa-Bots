@@ -80,7 +80,7 @@ export interface GameStoreState {
   // Third-Person Character Control & Proximity State
   activePlayerCrew: CrewId;
   nearbyBuilding: BuildingId | null;
-  astronautPositions: Record<CrewId, { x: number; z: number; rotation: number }>;
+  astronautPositions: Record<CrewId, { x: number; y?: number; z: number; rotation: number }>;
   showCrewSwitcher: boolean;
 
   // Actions
@@ -92,7 +92,7 @@ export interface GameStoreState {
   setActiveNavTab: (tab: ActiveNavTab) => void;
   setActivePlayerCrew: (c: CrewId) => void;
   setNearbyBuilding: (b: BuildingId | null) => void;
-  updateAstronautPosition: (id: CrewId, pos: { x: number; z: number; rotation: number }) => void;
+  updateAstronautPosition: (id: CrewId, pos: { x: number; y?: number; z: number; rotation: number }) => void;
   setShowCrewSwitcher: (s: boolean) => void;
   setTutorialStep: (step: number) => void;
   openTaskMenu: (b: BuildingId) => void;
@@ -228,7 +228,7 @@ export const useGameStore = create<GameStoreState>((set, get) => {
       }
     },
 
-    updateAstronautPosition: (id: CrewId, pos: { x: number; z: number; rotation: number }) => {
+    updateAstronautPosition: (id: CrewId, pos: { x: number; y?: number; z: number; rotation: number }) => {
       const positions = { ...get().astronautPositions, [id]: pos };
       set({ astronautPositions: positions });
     },

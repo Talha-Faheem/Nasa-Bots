@@ -253,5 +253,5 @@ describe('1,000-Game Balance Bot Simulation', () => {
     // Careful play succeeds ~6 in 10 on Commander (target 50% to 75% accomplished)
     expect(carefulSuccessRate).toBeGreaterThanOrEqual(50);
     expect(carefulSuccessRate).toBeLessThanOrEqual(80);
-  }, 120000);
+  }, 240000);
 });

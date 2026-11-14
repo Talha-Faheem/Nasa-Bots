@@ -12,6 +12,7 @@ import { CrewId } from '../sim/types.ts';
 import { BUILDING_COORDINATES, getCrewDisplayName } from '../sim/rules/crew.ts';
 import { useGameStore } from '../store/store.ts';
 import { eventBus } from '../store/bus.ts';
+import { getTerrainHeight, getTerrainSample } from './Physics/TerrainHeight.ts';
 
 const SUIT_ACCENTS: Record<CrewId, string> = {
   alex: '#3b82f6', // Systems Blue
@@ -122,10 +123,10 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
       }
     }
 
+    const clockTime = state.clock.getElapsedTime();
+
     // Procedural Animations: Walk, Run, Work, Idle
     if (!reducedMotion) {
-      const clockTime = state.clock.getElapsedTime();
-
       if (isMoving) {
         const t = clockTime * 11;
         visualPos.current.y = Math.abs(Math.sin(t)) * 0.14; // Footstep bounce
@@ -172,7 +173,6 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
       } else {
         // Natural idle breathing
         const bt = clockTime * 2.2;
-        visualPos.current.y = Math.sin(bt) * 0.02;
         if (leftLegRef.current && rightLegRef.current) {
           leftLegRef.current.rotation.x = 0;
           rightLegRef.current.rotation.x = 0;
@@ -182,6 +182,30 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
           rightArmRef.current.rotation.x = -Math.sin(bt) * 0.05;
         }
       }
+    }
+
+    // Precise Ground Clamping: Query exact terrain elevation beneath astronaut's feet
+    const groundY = getTerrainHeight(visualPos.current.x, visualPos.current.z);
+    const idleBob = !isMoving ? Math.sin(clockTime * 2.2) * 0.02 : 0;
+    visualPos.current.y = THREE.MathUtils.lerp(
+      visualPos.current.y,
+      groundY + idleBob,
+      isPlayerControlled ? 0.35 : 0.15
+    );
+
+    // Subtle natural tilt to match terrain slope
+    const sample = getTerrainSample(visualPos.current.x, visualPos.current.z);
+    if (visualRotRef.current) {
+      visualRotRef.current.rotation.x = THREE.MathUtils.lerp(
+        visualRotRef.current.rotation.x,
+        sample.normal.z * 0.25,
+        0.1
+      );
+      visualRotRef.current.rotation.z = THREE.MathUtils.lerp(
+        visualRotRef.current.rotation.z,
+        -sample.normal.x * 0.25,
+        0.1
+      );
     }
 
     groupRef.current.position.copy(visualPos.current);

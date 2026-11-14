@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import { useGameStore } from '../store/store.ts';
 import { eventBus } from '../store/bus.ts';
 import { GLTFModel } from './ModelLoader.tsx';
+import { getTerrainHeight, getTerrainSample } from './Physics/TerrainHeight.ts';
 
 export const Rover3D: React.FC = () => {
   const rover = useGameStore((s) => s.state.rover);
@@ -41,10 +42,16 @@ export const Rover3D: React.FC = () => {
         roverRef.current.lookAt(homePos);
       }
 
-      // Suspension bobbing along lunar regolith
-      const bob = Math.sin(state.clock.getElapsedTime() * 10) * 0.05;
-      currentPos.y += Math.abs(bob);
+      // Precise Ground Surface Elevation & Suspension Bobbing
+      const groundY = getTerrainHeight(currentPos.x, currentPos.z);
+      const bob = Math.sin(state.clock.getElapsedTime() * 10) * 0.04;
+      currentPos.y = groundY + 0.28 + Math.abs(bob);
       roverRef.current.position.copy(currentPos);
+
+      // Pitch and roll rover to align with terrain slope
+      const sample = getTerrainSample(currentPos.x, currentPos.z);
+      roverRef.current.rotation.x = sample.normal.z * 0.3;
+      roverRef.current.rotation.z = -sample.normal.x * 0.3;
 
       // Rotate wheels
       const wheelSpin = state.clock.getElapsedTime() * 12;

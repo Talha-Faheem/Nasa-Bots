@@ -15,6 +15,7 @@ import { CrewRoster3D } from './Crew.tsx';
 import { Rover3D } from './Rover.tsx';
 import { PlayerController } from './Characters/PlayerController.tsx';
 import { ColonyInfrastructure } from './ColonyInfrastructure.tsx';
+import { DepositMarkers } from './Environment/DepositMarkers.tsx';
 import { useGameStore } from '../store/store.ts';
 
 // Fixed-timestep simulation accumulator component inside R3F Canvas
@@ -93,6 +94,9 @@ export const World: React.FC = () => {
 
         {/* Authentic 3D Modular Colony Infrastructure & Props */}
         <ColonyInfrastructure />
+
+        {/* In-Situ Lunar Geological Outcrops & Interactive Beacons */}
+        <DepositMarkers />
 
         {/* 8 Outpost Buildings */}
         <BuildingMesh id="habitat" name="Habitat Base" icon="🏠" />

@@ -1,60 +1,61 @@
 /**
  * LUNAR FRONTIER: THE LAST 30 DAYS
  * src/game3d/Terrain.tsx
- * Low-frequency displaced lunar regolith terrain with craters and starfield.
+ * Realistic 3D lunar South Pole terrain with high-resolution craters, raised ejecta rims,
+ * permanently shadowed ice craters with frost sheen, and geological mineral zones.
  */
 
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
+import { getTerrainHeight, getTerrainSample } from './Physics/TerrainHeight.ts';
 
 export const Terrain: React.FC = () => {
-  // Generate procedural lunar heightmap with craters
+  // Generate procedural lunar heightmap and vertex color attributes
   const geometry = useMemo(() => {
-    const geo = new THREE.PlaneGeometry(120, 120, 64, 64);
+    // 140x140 meters terrain grid with 80x80 subdivision for crisp crater rims
+    const geo = new THREE.PlaneGeometry(140, 140, 80, 80);
     geo.rotateX(-Math.PI / 2);
 
     const pos = geo.attributes.position;
-    const craters = [
-      { x: -25, z: -20, r: 12, depth: 3.5 },
-      { x: 30, z: -15, r: 16, depth: 4.0 },
-      { x: -10, z: 35, r: 14, depth: 3.8 },
-      { x: 28, z: 25, r: 10, depth: 2.8 },
-      { x: -35, z: 15, r: 18, depth: 4.5 },
-    ];
+    const colors: number[] = [];
+
+    const baseRegolithColor = new THREE.Color('#64748b');
+    const highlandAnorthositeColor = new THREE.Color('#94a3b8');
+    const craterDeepShadowColor = new THREE.Color('#1e293b');
+    const waterIceFrostColor = new THREE.Color('#38bdf8');
+    const mineralOreColor = new THREE.Color('#b45309');
 
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
 
-      // Low frequency noise displacement
-      let y = Math.sin(x * 0.05) * Math.cos(z * 0.05) * 1.5;
-      y += Math.sin(x * 0.12 + 1.2) * Math.cos(z * 0.08) * 0.6;
-
-      // Flatten base outpost area near (0, 0)
-      const distFromCenter = Math.hypot(x, z);
-      if (distFromCenter < 22) {
-        y *= Math.pow(distFromCenter / 22, 2);
-      }
-
-      // Sculpt craters with raised ejecta rims
-      for (const c of craters) {
-        const d = Math.hypot(x - c.x, z - c.z);
-        if (d < c.r * 1.4) {
-          if (d < c.r) {
-            // Crater floor
-            const craterFactor = Math.cos((d / c.r) * Math.PI * 0.5);
-            y -= c.depth * craterFactor;
-          } else {
-            // Raised rim
-            const rimFactor = Math.sin(((d - c.r) / (c.r * 0.4)) * Math.PI);
-            y += (c.depth * 0.25) * rimFactor;
-          }
-        }
-      }
-
+      // Query shared single source of truth for exact terrain height
+      const y = getTerrainHeight(x, z);
       pos.setY(i, y);
+
+      const sample = getTerrainSample(x, z);
+      const vertexColor = baseRegolithColor.clone();
+
+      // Distinct Geological Zone Shading
+      if (sample.zone === 'Water Ice Deposit Zone') {
+        // Cold polar ice sheen in permanently shadowed crater
+        const iceFactor = Math.min(1.0, Math.max(0, -y / 3.0));
+        vertexColor.lerp(waterIceFrostColor, iceFactor * 0.75);
+      } else if (sample.zone === 'Mineral Deposit Zone') {
+        // Iron and titanium mineral deposits
+        vertexColor.lerp(mineralOreColor, 0.45);
+      } else if (y < -2.0) {
+        // Shadowed deep crater basins
+        vertexColor.lerp(craterDeepShadowColor, 0.6);
+      } else if (y > 1.2) {
+        // Highland ejecta ridges
+        vertexColor.lerp(highlandAnorthositeColor, 0.5);
+      }
+
+      colors.push(vertexColor.r, vertexColor.g, vertexColor.b);
     }
 
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     geo.computeVertexNormals();
     return geo;
   }, []);
@@ -62,12 +63,11 @@ export const Terrain: React.FC = () => {
   return (
     <mesh geometry={geometry} receiveShadow>
       <meshStandardMaterial
-        color="#707684"
-        roughness={0.92}
-        metalness={0.08}
+        vertexColors
+        roughness={0.88}
+        metalness={0.12}
         flatShading={false}
       />
     </mesh>
   );
 };
-

@@ -11,6 +11,7 @@ import { useGameStore } from '../../store/store.ts';
 import { BUILDING_COORDINATES } from '../../sim/rules/crew.ts';
 import { BuildingId, CrewId } from '../../sim/types.ts';
 import { eventBus } from '../../store/bus.ts';
+import { getTerrainHeight, getTerrainSample, resolveMovementCollisions } from '../Physics/TerrainHeight.ts';
 
 const CREW_LIST: CrewId[] = ['alex', 'sara', 'daniel', 'maya'];
 
@@ -140,16 +141,35 @@ export const PlayerController: React.FC = () => {
       const isSprinting = !!keysPressed.current['shift'];
       const speed = isSprinting ? 8.2 : 4.5; // units per second
 
-      currentPos.current.x = THREE.MathUtils.clamp(
-        currentPos.current.x + moveDir.x * speed * delta,
-        -32,
-        32
+      // Calculate tentative next step
+      const stepDist = speed * delta;
+      const tentativeX = currentPos.current.x + moveDir.x * stepDist;
+      const tentativeZ = currentPos.current.z + moveDir.z * stepDist;
+
+      // 1. Terrain slope and walkability query
+      const sample = getTerrainSample(tentativeX, tentativeZ);
+      const slopeFactor = sample.slopeDeg > 35 ? 0.05 : sample.slopeDeg > 20 ? 0.6 : 1.0;
+
+      // 2. Obstacle collision resolution (buildings, large boulders)
+      const targetX = THREE.MathUtils.clamp(
+        currentPos.current.x + moveDir.x * stepDist * slopeFactor,
+        -55,
+        55
       );
-      currentPos.current.z = THREE.MathUtils.clamp(
-        currentPos.current.z + moveDir.z * speed * delta,
-        -32,
-        32
+      const targetZ = THREE.MathUtils.clamp(
+        currentPos.current.z + moveDir.z * stepDist * slopeFactor,
+        -55,
+        55
       );
+
+      const resolved = resolveMovementCollisions(
+        { x: currentPos.current.x, z: currentPos.current.z },
+        { x: targetX, z: targetZ }
+      );
+
+      // 3. Exact terrain ground height query
+      const groundY = getTerrainHeight(resolved.x, resolved.z);
+      currentPos.current.set(resolved.x, groundY, resolved.z);
 
       // Rotate toward movement direction smoothly
       const targetAngle = Math.atan2(moveDir.x, moveDir.z);
@@ -157,6 +177,7 @@ export const PlayerController: React.FC = () => {
 
       updateAstronautPosition(activePlayerCrew, {
         x: currentPos.current.x,
+        y: currentPos.current.y,
         z: currentPos.current.z,
         rotation: currentRotation.current,
       });
