@@ -14,6 +14,7 @@ import { BuildingMesh } from './Buildings/BuildingMesh.tsx';
 import { CrewRoster3D } from './Crew.tsx';
 import { Rover3D } from './Rover.tsx';
 import { PlayerController } from './Characters/PlayerController.tsx';
+import { ColonyInfrastructure } from './ColonyInfrastructure.tsx';
 import { useGameStore } from '../store/store.ts';
 
 // Fixed-timestep simulation accumulator component inside R3F Canvas
@@ -89,6 +90,9 @@ export const World: React.FC = () => {
         <CameraRig />
         <PlayerController />
         <SimAccumulator />
+
+        {/* Authentic 3D Modular Colony Infrastructure & Props */}
+        <ColonyInfrastructure />
 
         {/* 8 Outpost Buildings */}
         <BuildingMesh id="habitat" name="Habitat Base" icon="🏠" />

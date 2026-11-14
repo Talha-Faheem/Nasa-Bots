@@ -9,6 +9,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../store/store.ts';
 import { eventBus } from '../store/bus.ts';
+import { GLTFModel } from './ModelLoader.tsx';
 
 export const Rover3D: React.FC = () => {
   const rover = useGameStore((s) => s.state.rover);
@@ -70,60 +71,25 @@ export const Rover3D: React.FC = () => {
         eventBus.emit('sound:play', { name: 'click' });
       }}
     >
-      {/* Headlights */}
-      <mesh position={[-0.5, 0.45, -1.2]}>
-        <sphereGeometry args={[0.08, 8, 8]} />
+      {/* Authentic Science Exploration Rover Model */}
+      <GLTFModel
+        url="/assets/models/rovers/rover_science.glb"
+        scale={0.82}
+        position={[0, 0, 0]}
+        fallbackGeometry="box"
+        fallbackSize={[1.6, 0.8, 2.4]}
+        fallbackColor="#e2e8f0"
+      />
+
+      {/* Dynamic Headlights */}
+      <mesh position={[-0.45, 0.45, -1.2]}>
+        <sphereGeometry args={[0.07, 8, 8]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
-      <mesh position={[0.5, 0.45, -1.2]}>
-        <sphereGeometry args={[0.08, 8, 8]} />
+      <mesh position={[0.45, 0.45, -1.2]}>
+        <sphereGeometry args={[0.07, 8, 8]} />
         <meshBasicMaterial color="#ffffff" />
       </mesh>
-
-      {/* Rotating Radar Dish */}
-      <mesh ref={radarRef} position={[-0.4, 1.5, 0.2]}>
-        <coneGeometry args={[0.25, 0.12, 12]} />
-        <meshStandardMaterial color="#cbd5e1" metalness={0.6} />
-      </mesh>
-      {/* Rover Chassis */}
-      <mesh position={[0, 0.5, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1.6, 0.6, 2.4]} />
-        <meshStandardMaterial color="#e2e8f0" metalness={0.4} roughness={0.5} />
-      </mesh>
-
-      {/* Sensor Mast & Science Camera */}
-      <mesh position={[0.4, 1.2, -0.6]} castShadow>
-        <cylinderGeometry args={[0.04, 0.04, 1.0, 8]} />
-        <meshStandardMaterial color="#94a3b8" />
-      </mesh>
-      <mesh position={[0.4, 1.7, -0.6]}>
-        <sphereGeometry args={[0.15, 8, 8]} />
-        <meshStandardMaterial color="#38bdf8" emissive="#0284c7" emissiveIntensity={0.5} />
-      </mesh>
-
-      {/* Sample Container Box */}
-      <mesh position={[0, 0.9, 0.5]} castShadow>
-        <boxGeometry args={[1.2, 0.4, 0.8]} />
-        <meshStandardMaterial color="#f59e0b" roughness={0.3} />
-      </mesh>
-
-      {/* Six Articulated Wheels */}
-      {[-0.9, 0.9].map((xSide, i) =>
-        [-0.8, 0, 0.8].map((zPos, j) => (
-          <mesh
-            key={`${i}-${j}`}
-            ref={(el) => {
-              if (el) wheelsRef.current[i * 3 + j] = el;
-            }}
-            position={[xSide, 0.3, zPos]}
-            rotation={[0, 0, Math.PI / 2]}
-            castShadow
-          >
-            <cylinderGeometry args={[0.3, 0.3, 0.22, 16]} />
-            <meshStandardMaterial color="#1e293b" roughness={0.9} />
-          </mesh>
-        ))
-      )}
     </group>
   );
 };

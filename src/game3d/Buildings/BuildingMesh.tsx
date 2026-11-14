@@ -12,6 +12,7 @@ import { BuildingId } from '../../sim/types.ts';
 import { BUILDING_COORDINATES } from '../../sim/rules/crew.ts';
 import { useGameStore } from '../../store/store.ts';
 import { eventBus } from '../../store/bus.ts';
+import { GLTFModel } from '../ModelLoader.tsx';
 
 interface BuildingProps {
   id: BuildingId;
@@ -83,6 +84,10 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
   const isAdvisoryActive =
     id === 'shelter' && state.radiationAdvisory && !state.radiationAdvisory.resolved;
 
+  if (isAdvisoryActive) {
+    statusColor = '#f59e0b';
+  }
+
   return (
     <group
       position={[coords.x, 0, coords.z]}
@@ -113,87 +118,75 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
         </mesh>
       )}
 
-      {/* Visual Building Geometries */}
+      {/* Visual Building Geometries - Authentic GLB Models */}
       {id === 'habitat' && (
         <group>
-          {/* Main Dome */}
-          <mesh position={[0, 2.2, 0]} castShadow receiveShadow>
-            <sphereGeometry args={[3.2, 32, 16, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
-            <meshStandardMaterial
-              color={isSelected ? '#38bdf8' : hovered ? '#f1f5f9' : '#e2e8f0'}
-              roughness={0.25}
-              metalness={0.2}
-            />
-          </mesh>
-          {/* Base Rim */}
-          <mesh position={[0, 0.4, 0]} castShadow receiveShadow>
-            <cylinderGeometry args={[3.4, 3.6, 0.8, 32]} />
-            <meshStandardMaterial color="#334155" roughness={0.7} />
-          </mesh>
-          {/* Airlock Tunnel */}
-          <mesh position={[0, 0.7, 3.4]} castShadow receiveShadow>
-            <boxGeometry args={[1.6, 1.4, 1.8]} />
-            <meshStandardMaterial color="#475569" roughness={0.5} />
-          </mesh>
+          <GLTFModel
+            url="/assets/models/habitats/inflatable_dome_shielded.glb"
+            scale={0.72}
+            position={[0, 0, 0]}
+            fallbackGeometry="sphere"
+            fallbackSize={[3.2, 3.2, 3.2]}
+            fallbackColor="#e2e8f0"
+          />
+          <GLTFModel
+            url="/assets/models/tunnels/airlock_dustlock.glb"
+            scale={0.7}
+            position={[0, 0, 3.6]}
+            rotation={[0, 0, 0]}
+          />
+          <GLTFModel
+            url="/assets/models/habitats/cupola_turret.glb"
+            scale={0.65}
+            position={[0, 4.4, 0]}
+          />
         </group>
       )}
 
       {id === 'power_station' && (
         <group>
-          {/* Battery Hub Box */}
-          <mesh position={[0, 1.0, 0]} castShadow receiveShadow>
-            <boxGeometry args={[3.0, 2.0, 3.0]} />
-            <meshStandardMaterial
-              color={isSelected ? '#38bdf8' : '#334155'}
-              roughness={0.4}
-              metalness={0.6}
-            />
-          </mesh>
-          {/* 8 Solar Panels in 2 Rows */}
-          {[-3.5, 3.5].map((rowOffset, rIdx) =>
-            [-3, -1, 1, 3].map((colOffset, cIdx) => (
-              <group key={`${rIdx}-${cIdx}`} position={[colOffset * 1.5, 0, rowOffset]}>
-                <mesh position={[0, 0.8, 0]} castShadow>
-                  <cylinderGeometry args={[0.08, 0.1, 1.6, 8]} />
-                  <meshStandardMaterial color="#94a3b8" />
-                </mesh>
-                <mesh position={[0, 1.5, 0]} rotation={[0.4, 0.3, 0]} castShadow receiveShadow>
-                  <boxGeometry args={[1.3, 0.08, 0.9]} />
-                  <meshStandardMaterial
-                    color="#1e3a8a"
-                    emissive="#38bdf8"
-                    emissiveIntensity={
-                      state.powerBreakdown.sunlightFactor > 0.5 ? 0.35 : 0.1
-                    }
-                    roughness={0.15}
-                    metalness={0.8}
-                  />
-                </mesh>
-              </group>
-            ))
-          )}
+          <GLTFModel
+            url="/assets/models/power/solar_array_tracking.glb"
+            scale={0.9}
+            position={[-2.4, 0, 0]}
+            fallbackGeometry="box"
+            fallbackSize={[1.5, 1.8, 1.5]}
+            fallbackColor="#1e3a8a"
+          />
+          <GLTFModel
+            url="/assets/models/power/solar_array_tracking.glb"
+            scale={0.9}
+            position={[2.4, 0, 0]}
+          />
+          <GLTFModel
+            url="/assets/models/power/battery_storage_container.glb"
+            scale={0.8}
+            position={[0, 0, -2.2]}
+          />
+          <GLTFModel
+            url="/assets/models/power/solar_tower.glb"
+            scale={0.8}
+            position={[0, 0, 2.2]}
+          />
         </group>
       )}
 
       {id === 'greenhouse' && (
         <group>
-          {/* Translucent Geodesic Dome */}
-          <mesh position={[0, 2.0, 0]} castShadow>
-            <sphereGeometry args={[3.0, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
-            <meshPhysicalMaterial
-              color="#a7f3d0"
-              transparent
-              opacity={0.65}
-              roughness={0.1}
-              transmission={0.6}
-              thickness={1.2}
-            />
-          </mesh>
-          {/* Foundation */}
-          <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
-            <cylinderGeometry args={[3.2, 3.3, 0.6, 24]} />
-            <meshStandardMaterial color="#334155" />
-          </mesh>
+          <GLTFModel
+            url="/assets/models/farming/greenhouse_module.glb"
+            scale={0.85}
+            position={[0, 0, 0]}
+            fallbackGeometry="cylinder"
+            fallbackSize={[3.0, 3.0, 2.0]}
+            fallbackColor="#a7f3d0"
+          />
+          <GLTFModel
+            url="/assets/models/tunnels/airlock_dustlock.glb"
+            scale={0.7}
+            position={[-3.4, 0, 0]}
+            rotation={[0, Math.PI / 2, 0]}
+          />
 
           {/* Dynamic 3D Crops inside Bed 1 */}
           <group position={[-1.0, 0.5, 0]}>
@@ -263,90 +256,89 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name, icon }) => {
 
       {id === 'recycler' && (
         <group>
-          {/* Water Tanks with fluid level */}
-          <mesh position={[-1.1, 1.6, 0]} castShadow receiveShadow>
-            <cylinderGeometry args={[0.9, 0.9, 2.8, 16]} />
-            <meshStandardMaterial color="#0284c7" metalness={0.6} roughness={0.3} />
-          </mesh>
-          <mesh position={[1.1, 1.4, 0]} castShadow receiveShadow>
-            <cylinderGeometry args={[0.8, 0.8, 2.4, 16]} />
-            <meshStandardMaterial color="#0369a1" metalness={0.6} roughness={0.3} />
-          </mesh>
-          {/* Condenser Base */}
-          <mesh position={[0, 0.3, 0]} castShadow receiveShadow>
-            <boxGeometry args={[3.4, 0.6, 2.2]} />
-            <meshStandardMaterial color="#475569" />
-          </mesh>
+          <GLTFModel
+            url="/assets/models/machinery/water_processing_skid.glb"
+            scale={1.1}
+            position={[-1.4, 0, 0]}
+            fallbackGeometry="cylinder"
+            fallbackSize={[1.2, 1.2, 2.5]}
+            fallbackColor="#0284c7"
+          />
+          <GLTFModel
+            url="/assets/models/machinery/oxygen_extraction_skid.glb"
+            scale={1.1}
+            position={[1.4, 0, 0]}
+            fallbackGeometry="box"
+            fallbackSize={[1.5, 1.5, 2.0]}
+            fallbackColor="#38bdf8"
+          />
         </group>
       )}
 
       {id === 'shelter' && (
         <group>
-          {/* Reinforced Mound */}
-          <mesh position={[0, 1.3, 0]} castShadow receiveShadow>
-            <sphereGeometry args={[3.6, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.4]} />
-            <meshStandardMaterial
-              color={isAdvisoryActive ? '#f59e0b' : '#64748b'}
-              emissive={isAdvisoryActive ? '#d97706' : '#000000'}
-              emissiveIntensity={isAdvisoryActive ? 0.6 : 0}
-              roughness={0.9}
-            />
-          </mesh>
-          {/* Heavy Blast Hatch */}
-          <mesh position={[0, 0.7, 3.2]} castShadow receiveShadow>
-            <boxGeometry args={[2.0, 1.4, 1.2]} />
-            <meshStandardMaterial color="#1e293b" metalness={0.8} roughness={0.3} />
-          </mesh>
+          <GLTFModel
+            url="/assets/models/habitats/regolith_shielded_habitat.glb"
+            scale={0.88}
+            position={[0, 0, 0]}
+            fallbackGeometry="sphere"
+            fallbackSize={[3.5, 3.5, 2.5]}
+            fallbackColor="#64748b"
+          />
+          <GLTFModel
+            url="/assets/models/mining/regolith_sintering_gantry.glb"
+            scale={0.7}
+            position={[0, 0, 3.2]}
+          />
         </group>
       )}
 
       {id === 'laboratory' && (
         <group>
-          <mesh position={[0, 1.5, 0]} castShadow receiveShadow>
-            <boxGeometry args={[3.6, 2.6, 2.8]} />
-            <meshStandardMaterial
-              color={isSelected ? '#38bdf8' : '#f8fafc'}
-              roughness={0.3}
-              metalness={0.4}
-            />
-          </mesh>
-          <mesh position={[1.2, 3.2, 0]} castShadow>
-            <cylinderGeometry args={[0.06, 0.08, 1.8, 8]} />
-            <meshStandardMaterial color="#cbd5e1" metalness={0.9} />
-          </mesh>
+          <GLTFModel
+            url="/assets/models/laboratories/medical_crew_care_module.glb"
+            scale={0.82}
+            position={[0, 0, 0]}
+            fallbackGeometry="box"
+            fallbackSize={[3.5, 2.5, 2.5]}
+            fallbackColor="#f8fafc"
+          />
+          <GLTFModel
+            url="/assets/models/habitats/cupola_turret.glb"
+            scale={0.7}
+            position={[2.8, 0, 0]}
+          />
         </group>
       )}
 
       {id === 'comms' && (
         <group>
-          <mesh position={[0, 3.5, 0]} castShadow>
-            <cylinderGeometry args={[0.15, 0.3, 6.5, 8]} />
-            <meshStandardMaterial color="#94a3b8" metalness={0.8} />
-          </mesh>
-          {/* Animated Rotating Earth Dish */}
-          <group ref={dishRef} position={[0, 6.4, 0]}>
-            <mesh rotation={[0.4, 0, 0]} castShadow>
-              <sphereGeometry args={[1.6, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.35]} />
-              <meshStandardMaterial color="#e2e8f0" metalness={0.6} roughness={0.2} />
-            </mesh>
-          </group>
+          <GLTFModel
+            url="/assets/models/environment/comms_relay_mast.glb"
+            scale={1.0}
+            position={[0, 0, 0]}
+            fallbackGeometry="cylinder"
+            fallbackSize={[0.3, 0.3, 6.0]}
+            fallbackColor="#94a3b8"
+          />
         </group>
       )}
 
       {id === 'rover_bay' && (
         <group>
-          <mesh position={[0, 0.15, 0]} receiveShadow>
-            <boxGeometry args={[4.2, 0.3, 5.0]} />
-            <meshStandardMaterial color="#334155" roughness={0.8} />
-          </mesh>
-          <mesh position={[-1.8, 1.0, -1.8]} castShadow>
-            <boxGeometry args={[0.4, 1.8, 0.4]} />
-            <meshStandardMaterial color="#f59e0b" />
-          </mesh>
-          <mesh position={[1.8, 1.0, -1.8]} castShadow>
-            <boxGeometry args={[0.4, 1.8, 0.4]} />
-            <meshStandardMaterial color="#f59e0b" />
-          </mesh>
+          <GLTFModel
+            url="/assets/models/machinery/workshop_vehicle_bay.glb"
+            scale={0.88}
+            position={[0, 0, 0]}
+            fallbackGeometry="box"
+            fallbackSize={[4.0, 1.5, 5.0]}
+            fallbackColor="#334155"
+          />
+          <GLTFModel
+            url="/assets/models/vehicles/crane_rover.glb"
+            scale={0.65}
+            position={[3.4, 0, 0]}
+          />
         </group>
       )}
 

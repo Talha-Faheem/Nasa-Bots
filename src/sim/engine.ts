@@ -43,7 +43,7 @@ export function createInitialState(
   siteConfig?: SiteConfig
 ): GameState {
   const spareParts =
-    difficulty === 'cadet' ? 8 : difficulty === 'commander' || difficulty === 'explorer' ? 6 : 4;
+    difficulty === 'cadet' ? 8 : difficulty === 'expert' || difficulty === 'veteran' ? 4 : 6;
 
   const startBattery = difficulty === 'cadet' ? 95 : 85;
   const startOxygen = difficulty === 'cadet' ? 95 : 90;
@@ -170,6 +170,7 @@ export function createInitialState(
     },
     objectives: createInitialObjectives(),
     achievements: createInitialAchievements(),
+    commandLog: [],
     log: [
       {
         id: 'init_1',
@@ -202,6 +203,14 @@ export class SimulationEngine {
    */
   dispatch(state: GameState, command: Command): GameState {
     const nextState = JSON.parse(JSON.stringify(state)) as GameState;
+    if (!nextState.commandLog) {
+      nextState.commandLog = [];
+    }
+    nextState.commandLog.push({
+      tick: nextState.mission.tick,
+      day: nextState.mission.day,
+      command,
+    });
 
     switch (command.type) {
       case 'SET_SPEED':

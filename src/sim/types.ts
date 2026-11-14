@@ -6,7 +6,7 @@
  */
 
 export type SiteId = 'moon' | 'mars';
-export type Difficulty = 'cadet' | 'explorer' | 'commander' | 'veteran';
+export type Difficulty = 'cadet' | 'explorer' | 'commander' | 'survival' | 'expert' | 'veteran';
 export type GameSpeed = 0 | 1 | 2 | 4;
 
 export type EndingType =
@@ -404,6 +404,13 @@ export interface Achievement {
   unlockedDay?: number;
 }
 
+export interface LoggedCommand {
+  tick: number;
+  day: number;
+  command: Command;
+  timestamp?: number;
+}
+
 export interface GameState {
   mission: MissionState;
   resources: ResourcesState;
@@ -430,6 +437,7 @@ export interface GameState {
   randomEventCooldown: number; // ticks until next random event allowed
   stats: GameStats;
   log: LogEntry[];
+  commandLog?: LoggedCommand[];
   upgrades?: Record<BuildingUpgradeId, boolean>;
   construction?: Record<ConstructionProjectId, { built: boolean; inProgress: boolean; progressTicks: number }>;
   objectives?: MissionObjective[];

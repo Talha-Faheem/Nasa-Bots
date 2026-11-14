@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "difficulty": "survival",
+  "food": {
+    "consumptionPerAstronautPerDay": 1.0,
+    "startingStock": 60.0,
+    "storageCapacity": 150.0,
+    "greenhouseBatchDays": 6.0,
+    "greenhouseYieldRations": 24.0,
+    "greenhouseWaterCostPerDay": 6.0,
+    "greenhousePowerCostKW": 3.0
+  },
+  "water": {
+    "consumptionPerAstronautPerDay": 4.0,
+    "startingStock": 300.0,
+    "storageCapacity": 600.0,
+    "recyclerRecoveryRate": 0.85,
+    "recyclerPowerCostKW": 1.5
+  },
+  "oxygen": {
+    "consumptionPerAstronautPerDay": 0.85,
+    "startingStock": 100.0,
+    "storageCapacity": 200.0,
+    "generatorProductionPerDay": 4.5,
+    "generatorWaterInputRatio": 1.2,
+    "generatorPowerCostKW": 2.0
+  },
+  "power": {
+    "solarGenerationPeakKW": 12.0,
+    "batteryCapacityKWh": 60.0,
+    "startingBatteryKWh": 50.0,
+    "basePowerDraw": {
+      "lifeSupportKW": 3.0,
+      "habitatKW": 2.0,
+      "greenhouseKW": 3.0,
+      "labKW": 2.0,
+      "commsKW": 0.5,
+      "recyclerKW": 1.5,
+      "oxygenGeneratorKW": 2.0
+    }
+  },
+  "spareParts": {
+    "startingStock": 6,
+    "storageCapacity": 20
+  },
+  "difficultyModifiers": {
+    "explorer": {
+      "suppliesMultiplier": 1.5,
+      "consumptionMultiplier": 0.75,
+      "eventFrequencyMultiplier": 0.5,
+      "startingParts": 8
+    },
+    "survival": {
+      "suppliesMultiplier": 1.0,
+      "consumptionMultiplier": 1.0,
+      "eventFrequencyMultiplier": 1.0,
+      "startingParts": 6
+    },
+    "expert": {
+      "suppliesMultiplier": 0.75,
+      "consumptionMultiplier": 1.25,
+      "eventFrequencyMultiplier": 1.5,
+      "startingParts": 4
+    }
+  },
+  "crew": {
+    "vitals": {
+      "healthMax": 100,
+      "staminaMax": 100,
+      "moraleMax": 100
+    },
+    "efficiencyFormula": {
+      "baseSpeed": 0.6,
+      "skillMultiplier": 0.08
+    }
+  }
+}
