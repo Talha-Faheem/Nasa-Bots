@@ -36,7 +36,15 @@ export type ActiveModal =
   | 'settings'
   | 'manual'
   | 'tutorial'
-  | 'save_load';
+  | 'save_load'
+  | 'pause'
+  | 'patch_notes'
+  | 'credits'
+  | 'controls';
+
+export type AppPhase = 'start_menu' | 'in_game';
+export type CameraMode = 'commander' | 'follow' | 'first_person';
+export type FpvControlMode = 'watch' | 'manual';
 
 export type SelectedEntity =
   | { type: 'building'; id: BuildingId }
@@ -77,6 +85,18 @@ export interface GameStoreState {
   soundMuted: boolean;
   detailLevel: DetailLevel;
 
+  // App Phase & Camera Modes
+  appPhase: AppPhase;
+  cameraMode: CameraMode;
+  fpvControlMode: FpvControlMode;
+  fpvHelmetHudVisible: boolean;
+  fpvHeadBob: boolean;
+  cameraFov: number;
+  mouseSensitivity: number;
+  invertY: boolean;
+  debugOverlay: boolean;
+  pointerLocked: boolean;
+
   // Third-Person Character Control & Proximity State
   activePlayerCrew: CrewId;
   nearbyBuilding: BuildingId | null;
@@ -86,6 +106,17 @@ export interface GameStoreState {
   // Actions
   dispatch: (command: Command) => void;
   advanceTick: () => void;
+  setAppPhase: (phase: AppPhase) => void;
+  setCameraMode: (mode: CameraMode) => void;
+  cycleCameraMode: () => void;
+  setFpvControlMode: (mode: FpvControlMode) => void;
+  setFpvHelmetHudVisible: (visible: boolean) => void;
+  setFpvHeadBob: (bob: boolean) => void;
+  setCameraFov: (fov: number) => void;
+  setMouseSensitivity: (sens: number) => void;
+  setInvertY: (invert: boolean) => void;
+  toggleDebugOverlay: () => void;
+  setPointerLocked: (locked: boolean) => void;
   setSelectedBuilding: (b: BuildingId | null) => void;
   setSelectedCrew: (c: CrewId | null) => void;
   setSelectedEntity: (e: SelectedEntity) => void;
@@ -122,13 +153,23 @@ export const useGameStore = create<GameStoreState>((set, get) => {
     selectedEntity: null,
     activeNavTab: null,
     taskTargetBuilding: null,
-    activeModal: 'briefing',
+    activeModal: 'none',
     learnCardContent: null,
     tutorialStep: -1,
     qualitySetting: 'medium',
     reducedMotion: false,
     soundMuted: false,
     detailLevel: 'explorer',
+    appPhase: 'start_menu',
+    cameraMode: 'commander',
+    fpvControlMode: 'watch',
+    fpvHelmetHudVisible: true,
+    fpvHeadBob: true,
+    cameraFov: 75,
+    mouseSensitivity: 1.0,
+    invertY: false,
+    debugOverlay: false,
+    pointerLocked: false,
     activePlayerCrew: 'alex',
     nearbyBuilding: null,
     astronautPositions: {
@@ -322,6 +363,27 @@ export const useGameStore = create<GameStoreState>((set, get) => {
       });
       eventBus.emit('camera:reset', undefined);
     },
+
+    setAppPhase: (phase: AppPhase) => set({ appPhase: phase }),
+    setCameraMode: (mode: CameraMode) => {
+      set({ cameraMode: mode });
+      eventBus.emit('sound:play', { name: 'click' });
+    },
+    cycleCameraMode: () => {
+      const current = get().cameraMode;
+      const next: CameraMode =
+        current === 'commander' ? 'follow' : current === 'follow' ? 'first_person' : 'commander';
+      set({ cameraMode: next });
+      eventBus.emit('sound:play', { name: 'click' });
+    },
+    setFpvControlMode: (mode: FpvControlMode) => set({ fpvControlMode: mode }),
+    setFpvHelmetHudVisible: (visible: boolean) => set({ fpvHelmetHudVisible: visible }),
+    setFpvHeadBob: (bob: boolean) => set({ fpvHeadBob: bob }),
+    setCameraFov: (fov: number) => set({ cameraFov: fov }),
+    setMouseSensitivity: (sens: number) => set({ mouseSensitivity: sens }),
+    setInvertY: (invert: boolean) => set({ invertY: invert }),
+    toggleDebugOverlay: () => set((s) => ({ debugOverlay: !s.debugOverlay })),
+    setPointerLocked: (locked: boolean) => set({ pointerLocked: locked }),
   };
 });
 

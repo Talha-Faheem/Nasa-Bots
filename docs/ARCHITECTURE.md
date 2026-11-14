@@ -147,3 +147,91 @@ sequenceDiagram
 - **Client State**: Zustand 5.0 for clean separation of UI state from simulation state.
 - **Testing**: Vitest 3.0 for fast headless unit tests, integration tests, and 1,000-run balance bots.
 - **Styling**: Tailwind CSS 3.4 for modular NASA telemetry theme styling.
+
+---
+
+## 6. Menu & Lifecycle Architecture (Start & Pause Menus)
+
+```mermaid
+stateDiagram-v2
+    [*] --> StartMenu: App Launch
+    StartMenu --> MissionBriefing: "START MISSION" (Camera Zoom)
+    MissionBriefing --> InGame: "Launch Mission"
+    InGame --> InGamePaused: Press ESC / P (Dispatches PAUSE)
+    InGamePaused --> InGame: "RESUME" (Dispatches RESUME)
+    InGamePaused --> StartMenu: "MAIN MENU" (Confirms unsaved state)
+    InGamePaused --> SaveLoadModal: "SAVE / LOAD MISSION"
+```
+
+1. **Start Menu Lifecycle**:
+   - The Start Menu is rendered before entering the main simulation. It mounts a dedicated, lightweight Three.js canvas (`StartMenuCanvas`) with a rotating NASA Moon, distant Earth, satellite orbit, and 3-layer parallax starfield.
+   - When "START MISSION" is triggered, a cinematic camera push transitions into the mission briefing, then unmounts the Start Menu canvas completely to reclaim 100% of GPU resources.
+   - Design system tokens are centralized in `src/ui/theme.ts` (Cyan `#2EC4D6`, Warning `#FFB020`, Background `#050A14` to `#0A1424`, Chamfered `clip-path` buttons).
+2. **Pause Menu Architecture**:
+   - Triggered by `Escape` or `P` (or top navigation button).
+   - Pausing is deterministic: the simulation tick accumulator stops, active task progress freezes, audio ducks, and a `{ type: 'PAUSE' }` command is appended to the replayable `commandLog`.
+   - If the player is in First-Person View, pointer lock is immediately released on pause and restored on resume.
+
+---
+
+## 7. Multi-Mode Camera System & First-Person View (FPV)
+
+```mermaid
+graph TD
+    CamSystem[Camera Manager] --> Mode{Camera Mode}
+    Mode -->|Commander| OrbitCam[Orbit & Strategic Overhead View]
+    Mode -->|Follow| ThirdPersonCam[Third-Person Chase Camera with Occlusion Push]
+    Mode -->|First Person| FpvCam[Helmet Interior Camera at 1.6m]
+    FpvCam --> HeadCull[Layer/Cull Astronaut Head Mesh]
+    FpvCam --> PointerLock[Pointer Lock API Mouse Look]
+    FpvCam --> HelmetHUD[Interactive Visor Vignette, Telemetry & Fog]
+    FpvCam --> ControlMode{Control Mode}
+    ControlMode -->|Watch Mode| AIControlled[Inspect AI Pathing & Task Animation]
+    ControlMode -->|Manual Walk| PlayerMove[WASD Low-Gravity Locomotion & E Interact]
+```
+
+- **Camera Modes**:
+  1. `commander`: Orbit and zoom controls for overall base management.
+  2. `follow`: Third-person follow camera positioned 3.5m behind and 1.8m above selected astronaut with sphere-cast camera collision.
+  3. `first_person`: Positioned at eye height (1.6m) inside the selected astronaut's helmet.
+- **Head Culling**: The astronaut's head mesh is culled from the FPV camera so the player never sees the inside of the neck or helmet shell, while arms, hands, and suit chest telemetry remain visible.
+- **Watch Mode vs Manual Walk Mode**:
+  - In *Watch Mode*, the camera follows the AI astronaut's physical transit and smooth gaze toward work targets.
+  - In *Manual Walk Mode*, the player moves the astronaut with WASD, sprint with Shift, and interacts with `E`. Movement inputs are validated against ground elevation, low-gravity leap mechanics, and obstacle walls.
+
+---
+
+## 8. Authoritative Collision & Navigation Architecture
+
+```mermaid
+flowchart LR
+    Target[Destination Query] --> InflatedAStar[Inflated-Obstacle A* Nav Grid]
+    InflatedAStar --> Waypoints[Smooth Waypoints]
+    Waypoints --> KCC[Kinematic Character Controller]
+    KCC --> TerrainSnap[Terrain Elevation & Slope Normal]
+    KCC --> WallSlide[Obstacle Collision & Tangent Sliding]
+    KCC --> LocalAvoid[Separation Steering vs Other Crew]
+    LocalAvoid --> InteractionPoint[Free Exterior Interaction Bay]
+```
+
+1. **Data-Driven Building Footprints**: Every facility defines a footprint boundary, obstacle collider, and dedicated exterior interaction stations (outside the building boundary).
+2. **Authoritative Navigation Mesh / Grid**:
+   - Grid resolution of 0.5m across the $80 \times 80$m terrain.
+   - Obstacles are inflated by the agent capsule radius ($0.4$m) plus a $0.2$m safety buffer.
+   - AI astronauts strictly follow A* paths through open corridors ($\ge 1.5$m) and enter airlocks only through designated door waypoints.
+3. **Kinematic Character Controller & Collision**:
+   - Continuous circle/box collision test with tangent wall sliding.
+   - Characters snap to `getTerrainHeight(x, z)` and are blocked by slopes $> 35^\circ$.
+   - Local avoidance steering prevents astronauts from overlapping.
+4. **Stuck Detection**:
+   - If a moving astronaut progresses $< 0.1$m over 3 seconds, a repath is executed. After 3 failed repaths, an alert is logged and the character snaps to the nearest valid corridor waypoint.
+5. **Debug Overlay (`F3`)**:
+   - Visualizes navmesh grid, building footprints, character capsule colliders, interaction points, and stuck telemetry.
+
+---
+
+## 9. Asset Licensing & Attribution Protocol
+
+- All 3D models, textures, audio samples, and fonts must be documented in `docs/ASSETS.md`.
+- Permitted licenses: NASA Open Data (public domain), CC0 (Poly Haven, ambientCG, Kenney, Quaternius), Creative Commons with attribution (Sketchfab, Pixabay, Freesound).
+- In-game credits modal provides full attribution to the NASA Scientific Visualization Studio and all contributing artists.

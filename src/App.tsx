@@ -7,6 +7,9 @@
 import React, { useEffect } from 'react';
 import { World } from './game3d/World.tsx';
 import { Hud } from './ui/Hud.tsx';
+import { StartMenu } from './ui/StartMenu/StartMenu.tsx';
+import { PauseMenu } from './ui/PauseMenu/PauseMenu.tsx';
+import { FpvHelmetHud } from './ui/FpvHelmetHud.tsx';
 import { TaskMenu } from './ui/TaskMenu.tsx';
 import { DecisionModal } from './ui/Decision.tsx';
 import { ReportModal } from './ui/Report.tsx';
@@ -24,8 +27,13 @@ export const App: React.FC = () => {
   const dispatch = useGameStore((s) => s.dispatch);
   const isPaused = useGameStore((s) => s.state.mission.isPaused);
   const soundMuted = useGameStore((s) => s.soundMuted);
+  const appPhase = useGameStore((s) => s.appPhase);
+  const activeModal = useGameStore((s) => s.activeModal);
+  const setModal = useGameStore((s) => s.setModal);
+  const cycleCameraMode = useGameStore((s) => s.cycleCameraMode);
+  const toggleDebugOverlay = useGameStore((s) => s.toggleDebugOverlay);
 
-  // Keyboard accessibility controls (Spacebar = pause/resume, 1, 2, 4 = speeds)
+  // Keyboard accessibility controls (Esc/P = Pause menu, V = Camera, F3 = Debug, Space = Pause sim, 1/2/4 = Speeds)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Don't intercept if typing in an input
@@ -33,21 +41,57 @@ export const App: React.FC = () => {
         return;
       }
 
-      if (e.code === 'Space') {
+      // F3 Debug Overlay toggle
+      if (e.key === 'F3') {
         e.preventDefault();
-        dispatch(isPaused ? { type: 'RESUME' } : { type: 'PAUSE' });
-      } else if (e.key === '1') {
-        dispatch({ type: 'SET_SPEED', speed: 1 });
-      } else if (e.key === '2') {
-        dispatch({ type: 'SET_SPEED', speed: 2 });
-      } else if (e.key === '4') {
-        dispatch({ type: 'SET_SPEED', speed: 4 });
+        toggleDebugOverlay();
+        eventBus.emit('sound:play', { name: 'click' });
+        return;
+      }
+
+      if (appPhase === 'in_game') {
+        // Escape or P triggers Pause Menu
+        if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+          e.preventDefault();
+          if (activeModal === 'none') {
+            dispatch({ type: 'PAUSE' });
+            setModal('pause');
+            eventBus.emit('sound:play', { name: 'click' });
+          } else if (activeModal === 'pause') {
+            dispatch({ type: 'RESUME' });
+            setModal('none');
+            eventBus.emit('sound:play', { name: 'click' });
+          } else {
+            // Close active modal
+            setModal('none');
+            eventBus.emit('sound:play', { name: 'click' });
+          }
+          return;
+        }
+
+        // Camera mode cycling: V
+        if (e.key === 'v' || e.key === 'V') {
+          e.preventDefault();
+          cycleCameraMode();
+          return;
+        }
+
+        if (e.code === 'Space') {
+          e.preventDefault();
+          dispatch(isPaused ? { type: 'RESUME' } : { type: 'PAUSE' });
+        } else if (e.key === '1') {
+          dispatch({ type: 'SET_SPEED', speed: 1 });
+        } else if (e.key === '2') {
+          dispatch({ type: 'SET_SPEED', speed: 2 });
+        } else if (e.key === '4') {
+          dispatch({ type: 'SET_SPEED', speed: 4 });
+        }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [dispatch, isPaused]);
+  }, [dispatch, isPaused, appPhase, activeModal, setModal, cycleCameraMode, toggleDebugOverlay]);
 
   // Audio effects synthesizer using Web Audio API (reliable, zero external file dependency)
   useEffect(() => {
@@ -66,7 +110,9 @@ export const App: React.FC = () => {
         const gain = audioCtx.createGain();
         osc.type = type;
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        // Duck audio if paused
+        const vol = isPaused ? 0.03 : 0.08;
+        gain.gain.setValueAtTime(vol, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -96,29 +142,48 @@ export const App: React.FC = () => {
       unsubSound();
       audioCtx?.close();
     };
-  }, [soundMuted]);
+  }, [soundMuted, isPaused]);
 
   return (
     <div className="relative w-screen h-screen overflow-hidden bg-slate-950 font-sans">
-      {/* 3D WebGL Canvas Layer */}
-      <World />
+      {appPhase === 'start_menu' ? (
+        // Start Menu Screen (Disposed completely when transitioning to in_game)
+        <>
+          <StartMenu />
+          <SettingsModal />
+          <SaveLoadModal />
+          <BriefingModal />
+        </>
+      ) : (
+        // Active 3D Lunar Frontier Game Scene & HUD
+        <>
+          {/* 3D WebGL Canvas Layer */}
+          <World />
 
-      {/* React HUD Layer */}
-      <Hud />
+          {/* React HUD Layer */}
+          <Hud />
 
-      {/* Accessible Modals */}
-      <BriefingModal />
-      <TaskMenu />
-      <DecisionModal />
-      <ReportModal />
-      <DataSourcesModal />
-      <LearnCardModal />
-      <SettingsModal />
-      <UserManualModal />
-      <SaveLoadModal />
+          {/* First-Person Helmet Visor HUD */}
+          <FpvHelmetHud />
 
-      {/* Interactive Walkthrough Tutorial */}
-      <TutorialOverlay />
+          {/* Pause Menu Overlay */}
+          <PauseMenu />
+
+          {/* Accessible Modals */}
+          <BriefingModal />
+          <TaskMenu />
+          <DecisionModal />
+          <ReportModal />
+          <DataSourcesModal />
+          <LearnCardModal />
+          <SettingsModal />
+          <UserManualModal />
+          <SaveLoadModal />
+
+          {/* Interactive Walkthrough Tutorial */}
+          <TutorialOverlay />
+        </>
+      )}
     </div>
   );
 };

@@ -38,6 +38,7 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
   const reducedMotion = useGameStore((s) => s.reducedMotion);
   const activeModal = useGameStore((s) => s.activeModal);
   const activeNavTab = useGameStore((s) => s.activeNavTab);
+  const cameraMode = useGameStore((s) => s.cameraMode);
 
   const groupRef = useRef<THREE.Group>(null);
   const visualRotRef = useRef<THREE.Group>(null);
@@ -272,14 +273,19 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
         </mesh>
 
         {/* Extravehicular Visor Helmet with Gold Solar Reflection Shield */}
-        <mesh position={[0, 1.5, 0]} castShadow>
-          <sphereGeometry args={[0.32, 16, 16]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.2} />
-        </mesh>
-        <mesh position={[0, 1.5, 0.16]}>
-          <sphereGeometry args={[0.22, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.45]} />
-          <meshStandardMaterial color="#f59e0b" metalness={0.95} roughness={0.05} />
-        </mesh>
+        {/* Culled in First-Person View so helmet interior never clips camera */}
+        {!(isPlayerControlled && cameraMode === 'first_person') && (
+          <group>
+            <mesh position={[0, 1.5, 0]} castShadow>
+              <sphereGeometry args={[0.32, 16, 16]} />
+              <meshStandardMaterial color="#ffffff" roughness={0.2} />
+            </mesh>
+            <mesh position={[0, 1.5, 0.16]}>
+              <sphereGeometry args={[0.22, 16, 8, 0, Math.PI * 2, 0, Math.PI * 0.45]} />
+              <meshStandardMaterial color="#f59e0b" metalness={0.95} roughness={0.05} />
+            </mesh>
+          </group>
+        )}
 
         {/* Left and Right Legs */}
         <mesh ref={leftLegRef} position={[-0.16, 0.32, 0]} castShadow>

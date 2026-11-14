@@ -16,6 +16,7 @@ import { Rover3D } from './Rover.tsx';
 import { PlayerController } from './Characters/PlayerController.tsx';
 import { ColonyInfrastructure } from './ColonyInfrastructure.tsx';
 import { DepositMarkers } from './Environment/DepositMarkers.tsx';
+import { DebugOverlay } from './DebugOverlay.tsx';
 import { useGameStore } from '../store/store.ts';
 
 // Fixed-timestep simulation accumulator component inside R3F Canvas
@@ -111,6 +112,9 @@ export const World: React.FC = () => {
         {/* Dynamic Crew Figures & Rover */}
         <CrewRoster3D />
         <Rover3D />
+
+        {/* F3 Authoritative Debug Visualizer */}
+        <DebugOverlay />
       </Canvas>
     </div>
   );
