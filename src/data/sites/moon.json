@@ -1,0 +1,17 @@
+{
+  "id": "moon",
+  "name": "Lunar South Pole (Shackleton Rim)",
+  "body": "Moon",
+  "sunlightSchedule": {
+    "days1to10": 1.0,
+    "days11to15": 0.8,
+    "days16to22": 0.5,
+    "days23to30": 0.7
+  },
+  "baseArrayOutput": 120,
+  "commDelayOneWaySeconds": 1.3,
+  "commDelayTicks": 0,
+  "dustStormRisk": false,
+  "description": "Near the lunar south pole, peaks of eternal light offer prolonged solar access, but shadow transitions severely test battery reserves."
+}
+

@@ -1,0 +1,55 @@
+[
+  {
+    "activityID": "2024-05-10T06:54:00-CME-001",
+    "catalog": "M2M_CATALOG",
+    "eventType": "CME",
+    "classType": "X5.8",
+    "startTime": "2024-05-10T06:54Z",
+    "speed": 1250,
+    "severity": 4,
+    "sourceLocation": "Active Region 3664",
+    "instruments": ["SOHO/LASCO", "SDO/AIA", "GOES-16"],
+    "badge": "Archived NASA",
+    "summary": "Historic solar storm of May 2024. Massive fast CME associated with X5.8 flare from giant sunspot AR3664."
+  },
+  {
+    "activityID": "2024-05-14T16:51:00-FLR-001",
+    "catalog": "M2M_CATALOG",
+    "eventType": "Solar Flare",
+    "classType": "X8.7",
+    "startTime": "2024-05-14T16:51Z",
+    "speed": 1800,
+    "severity": 5,
+    "sourceLocation": "Active Region 3664",
+    "instruments": ["GOES-16/EXIS", "SOHO"],
+    "badge": "Archived NASA",
+    "summary": "Strongest solar flare of Solar Cycle 25 (rated X8.7), launching a hyper-velocity CME and significant proton enhancement."
+  },
+  {
+    "activityID": "2023-03-23T11:24:00-CME-001",
+    "catalog": "M2M_CATALOG",
+    "eventType": "CME",
+    "classType": "M2.1",
+    "startTime": "2023-03-23T11:24Z",
+    "speed": 780,
+    "severity": 2,
+    "sourceLocation": "Active Region 3256",
+    "instruments": ["STEREO-A", "SOHO"],
+    "badge": "Archived NASA",
+    "summary": "Moderate coronal mass ejection following an M2.1 eruptive prominence. Typical operational space weather."
+  },
+  {
+    "activityID": "2022-10-02T19:53:00-FLR-001",
+    "catalog": "M2M_CATALOG",
+    "eventType": "Solar Flare",
+    "classType": "X1.0",
+    "startTime": "2022-10-02T19:53Z",
+    "speed": 950,
+    "severity": 3,
+    "sourceLocation": "Active Region 3110",
+    "instruments": ["SDO/AIA", "GOES-16"],
+    "badge": "Archived NASA",
+    "summary": "Impulsive X1.0 flare generating radio blackout and energetic solar particle front across the Moon-Earth corridor."
+  }
+]
+

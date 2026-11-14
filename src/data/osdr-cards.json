@@ -1,0 +1,39 @@
+[
+  {
+    "id": "osdr-bone-density",
+    "title": "Bone Mineral Density in Lunar Gravity",
+    "badge": "Archived NASA",
+    "osdrStudyID": "OSDR-214",
+    "category": "Crew Physiology",
+    "summary": "In 1/6th lunar gravity, osteoclasts break down bone tissue faster than osteoblasts replace it. Astronauts require daily resistive exercise to preserve trabecular density.",
+    "gameplayLink": "Skipping daily exercise incurs a -3 health penalty due to physiological deconditioning."
+  },
+  {
+    "id": "osdr-plant-veg",
+    "title": "Microgreen Crop Photobiology (VEGGIE)",
+    "badge": "Archived NASA",
+    "osdrStudyID": "OSDR-421",
+    "category": "Space Agriculture",
+    "summary": "NASA Veggie and Advanced Plant Habitat experiments show that red/blue light spectra optimize carotenoid and anthocyanin antioxidants in space-grown Brassica greens.",
+    "gameplayLink": "Greenhouse light power directly influences crop maturation speed and nutrient yield for the crew."
+  },
+  {
+    "id": "osdr-circadian",
+    "title": "Circadian Rhythms & Cognitive Performance",
+    "badge": "Archived NASA",
+    "osdrStudyID": "OSDR-118",
+    "category": "Human Factors",
+    "summary": "Without an Earth 24-hour day/night cycle, astronauts experience circadian desynchronization, reducing motor alertness and repair task precision.",
+    "gameplayLink": "Astronauts have 8 work hours after routine care (sleep, meals, exercise). Overworking causes fatigue and health degradation."
+  },
+  {
+    "id": "osdr-regolith-shield",
+    "title": "In-Situ Lunar Regolith Radiation Attenuation",
+    "badge": "Archived NASA",
+    "osdrStudyID": "OSDR-502",
+    "category": "Planetary Protection",
+    "summary": "Lunar regolith (silicon, iron, aluminum oxides) provides excellent mass shielding against solar protons when compacted over base habitats.",
+    "gameplayLink": "Building regolith shield layers permanently raises outpost protection from 60 to up to 90."
+  }
+]
+

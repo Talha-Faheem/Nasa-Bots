@@ -1,0 +1,11 @@
+{
+  "source": "NASA Open Science Data Repository (OSDR) RadLab Dosimetry",
+  "datasetID": "OSDR-RADLAB-ISS-01",
+  "badge": "Archived NASA",
+  "instrument": "ISS Columbus Radiation Assessment Detector (RAD)",
+  "location": "Low Earth Orbit (LEO) - International Space Station",
+  "observationDate": "2024-05-11T12:00:00Z",
+  "doseRateMeasuredMicroGyPerDay": 340,
+  "comparisonNote": "The ISS orbits inside Earth's protective geomagnetic shield (magnetosphere), absorbing roughly 0.3-0.5 mGy/day. On the lunar surface with no atmosphere or global magnetic field, unshielded galactic cosmic ray and solar proton risk is substantially higher (~1.0 to >100 mGy/day during storms)."
+}
+

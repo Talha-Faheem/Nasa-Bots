@@ -1,0 +1,17 @@
+{
+  "id": "mars",
+  "name": "Jezero Crater Outpost",
+  "body": "Mars",
+  "sunlightSchedule": {
+    "days1to10": 0.65,
+    "days11to15": 0.60,
+    "days16to22": 0.40,
+    "days23to30": 0.55
+  },
+  "baseArrayOutput": 160,
+  "commDelayOneWaySeconds": 720.0,
+  "commDelayTicks": 6,
+  "dustStormRisk": true,
+  "description": "At Jezero Crater, reduced solar irradiance and global dust storms create severe energy pressure. 6-hour communication delay forces autonomous crew decisions."
+}
+

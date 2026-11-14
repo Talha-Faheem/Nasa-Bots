@@ -1,0 +1,36 @@
+{
+  "educationalNotice": "This severity scale is an educational model mapping real solar observations to simulated base risk points. Never convert a flare or CME record into an actual astronaut radiation dose.",
+  "mappings": [
+    {
+      "severity": 1,
+      "eventTypes": ["C-class flare"],
+      "description": "Minor solar brightening. Negligible proton flux enhancement.",
+      "simulatedExposureBase": 10
+    },
+    {
+      "severity": 2,
+      "eventTypes": ["M-class flare", "Slow CME (<500 km/s)"],
+      "description": "Moderate solar flare. Slight increase in background particle levels.",
+      "simulatedExposureBase": 20
+    },
+    {
+      "severity": 3,
+      "eventTypes": ["Strong M-class flare", "Fast CME (>1000 km/s)"],
+      "description": "Substantial coronal mass ejection directed toward inner solar system.",
+      "simulatedExposureBase": 30
+    },
+    {
+      "severity": 4,
+      "eventTypes": ["X-class flare", "Solar Energetic Particle (SEP) event"],
+      "description": "Major flare accompanied by energetic relativistic protons reaching lunar orbit.",
+      "simulatedExposureBase": 40
+    },
+    {
+      "severity": 5,
+      "eventTypes": ["Extreme X-class flare with major SEP event"],
+      "description": "Super-flare with severe proton storm. Underground regolith shelter mandatory.",
+      "simulatedExposureBase": 50
+    }
+  ]
+}
+
