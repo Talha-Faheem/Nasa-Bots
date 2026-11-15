@@ -6,7 +6,7 @@
 ---
 
 ## 🎮 Play the Mission
-Open your browser to: **https://nasa-bots.vercel.app/(https://nasa-bots.vercel.app/)**
+Open your browser to: **https://nasa-bots.vercel.app/**
 
 ---
 
