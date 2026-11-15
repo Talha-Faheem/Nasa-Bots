@@ -10,7 +10,7 @@
  */
 
 import React, { useState } from 'react';
-import { useGameStore } from '../store/store.ts';
+import { useGameStore, SelectedEntity } from '../store/store.ts';
 import { BuildingId, CrewId } from '../sim/types.ts';
 import { getCrewDisplayName } from '../sim/rules/crew.ts';
 import { getUpgradesForBuilding } from '../sim/rules/upgrades.ts';
@@ -26,8 +26,7 @@ import {
   Compass,
 } from './icons.tsx';
 
-export const ContextPanel: React.FC = () => {
-  const selectedEntity = useGameStore((s) => s.selectedEntity);
+const ContextPanelContent: React.FC<{ selectedEntity: NonNullable<SelectedEntity> }> = ({ selectedEntity }) => {
   const setSelectedEntity = useGameStore((s) => s.setSelectedEntity);
   const openTaskMenu = useGameStore((s) => s.openTaskMenu);
   const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
@@ -37,8 +36,6 @@ export const ContextPanel: React.FC = () => {
 
   const [buildingTab, setBuildingTab] = useState<'overview' | 'operations' | 'upgrades'>('overview');
   const [selectedWorker, setSelectedWorker] = useState<CrewId>('alex');
-
-  if (!selectedEntity) return null;
 
   const closePanel = () => {
     setSelectedEntity(null);
@@ -613,4 +610,10 @@ export const ContextPanel: React.FC = () => {
   }
 
   return null;
+};
+
+export const ContextPanel: React.FC = () => {
+  const selectedEntity = useGameStore((s) => s.selectedEntity);
+  if (!selectedEntity) return null;
+  return <ContextPanelContent selectedEntity={selectedEntity} />;
 };

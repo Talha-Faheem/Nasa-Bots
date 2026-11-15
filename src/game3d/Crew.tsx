@@ -32,7 +32,6 @@ const CREW_OFFSETS: Record<CrewId, [number, number]> = {
 export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
   const crew = useGameStore((s) => s.state.crew[id]);
   const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
-  const astronautPositions = useGameStore((s) => s.astronautPositions);
   const setSelectedEntity = useGameStore((s) => s.setSelectedEntity);
   const selectedEntity = useGameStore((s) => s.selectedEntity);
   const setActivePlayerCrew = useGameStore((s) => s.setActivePlayerCrew);
@@ -64,7 +63,7 @@ export const CrewFigure: React.FC<{ id: CrewId }> = ({ id }) => {
 
     if (isPlayerControlled) {
       // Position is driven directly by PlayerController in real-time
-      const realPos = astronautPositions[id] || { x: 0, z: 0, rotation: 0 };
+      const realPos = useGameStore.getState().astronautPositions[id] || { x: 0, z: 0, rotation: 0 };
       targetX = realPos.x;
       targetZ = realPos.z;
       targetRot = realPos.rotation;

@@ -10,17 +10,14 @@ import React from 'react';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { useGameStore } from '../store/store.ts';
-import { BUILDING_FOOTPRINTS, AGENT_RADIUS } from './Physics/NavigationMesh.ts';
+import { BUILDING_FOOTPRINT_LIST, AGENT_RADIUS } from './Physics/NavigationMesh.ts';
 import { getTerrainHeight } from './Physics/TerrainHeight.ts';
 
-export const DebugOverlay: React.FC = () => {
-  const debugOverlay = useGameStore((s) => s.debugOverlay);
+const DebugOverlayContent: React.FC = () => {
   const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
   const astronautPositions = useGameStore((s) => s.astronautPositions);
   const cameraMode = useGameStore((s) => s.cameraMode);
   const state = useGameStore((s) => s.state);
-
-  if (!debugOverlay) return null;
 
   const currentPos = astronautPositions[activePlayerCrew] || { x: 0, z: 0 };
   const currentY = currentPos.y ?? getTerrainHeight(currentPos.x, currentPos.z);
@@ -28,7 +25,7 @@ export const DebugOverlay: React.FC = () => {
   return (
     <group name="F3DebugOverlay">
       {/* 1. Building Footprints & Collision Colliders */}
-      {Object.values(BUILDING_FOOTPRINTS).map((fp) => {
+      {BUILDING_FOOTPRINT_LIST.map((fp) => {
         const posY = getTerrainHeight(fp.center.x, fp.center.z);
 
         return (
@@ -123,4 +120,10 @@ export const DebugOverlay: React.FC = () => {
       </Html>
     </group>
   );
+};
+
+export const DebugOverlay: React.FC = () => {
+  const debugOverlay = useGameStore((s) => s.debugOverlay);
+  if (!debugOverlay) return null;
+  return <DebugOverlayContent />;
 };

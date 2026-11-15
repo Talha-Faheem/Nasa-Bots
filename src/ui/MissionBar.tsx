@@ -29,14 +29,13 @@ import {
 import { eventBus } from '../store/bus.ts';
 
 export const MissionBar: React.FC = () => {
-  const state = useGameStore((s) => s.state);
+  const mission = useGameStore((s) => s.state.mission);
   const dispatch = useGameStore((s) => s.dispatch);
   const setModal = useGameStore((s) => s.setModal);
   const setTutorialStep = useGameStore((s) => s.setTutorialStep);
   const cameraMode = useGameStore((s) => s.cameraMode);
   const setCameraMode = useGameStore((s) => s.setCameraMode);
 
-  const { mission } = state;
   const progressPercent = Math.min(100, Math.round(((mission.day - 1 + mission.tick / 24) / 30) * 100));
 
   const handleCameraChange = (mode: CameraMode) => {

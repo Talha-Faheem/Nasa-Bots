@@ -31,7 +31,6 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name }) => {
   const selectedEntity = useGameStore((s) => s.selectedEntity);
   const activeNavTab = useGameStore((s) => s.activeNavTab);
 
-  const state = useGameStore((s) => s.state);
   const coords = BUILDING_COORDINATES[id];
   const isSelected = selectedBuilding === id;
 
@@ -54,28 +53,32 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name }) => {
     }
   });
 
-  // Determine system condition & status color
-  let condition = 100;
-  let isFaulted = false;
-  if (id === 'power_station') {
-    condition = state.systems.solarArray.condition;
-    isFaulted = state.systems.solarArray.isFaulted;
-  } else if (id === 'habitat') {
-    condition = state.systems.lifeSupport.condition;
-    isFaulted = state.systems.lifeSupport.isFaulted;
-  } else if (id === 'recycler') {
-    condition = state.systems.recycler.condition;
-    isFaulted = state.systems.recycler.isFaulted;
-  } else if (id === 'greenhouse') {
-    condition = state.systems.greenhouse.condition;
-    isFaulted = state.systems.greenhouse.isFaulted;
-  } else if (id === 'comms') {
-    condition = state.systems.comms.condition;
-    isFaulted = state.systems.comms.isFaulted;
-  } else if (id === 'rover_bay') {
-    condition = state.rover.condition;
-    isFaulted = state.rover.isFaulted;
-  }
+  // Targeted selectors prevent all 8 buildings from re-rendering on every simulation tick
+  const condition = useGameStore((s) => {
+    if (id === 'power_station') return s.state.systems.solarArray.condition;
+    if (id === 'habitat') return s.state.systems.lifeSupport.condition;
+    if (id === 'recycler') return s.state.systems.recycler.condition;
+    if (id === 'greenhouse') return s.state.systems.greenhouse.condition;
+    if (id === 'comms') return s.state.systems.comms.condition;
+    if (id === 'rover_bay') return s.state.rover.condition;
+    return 100;
+  });
+
+  const isFaulted = useGameStore((s) => {
+    if (id === 'power_station') return s.state.systems.solarArray.isFaulted;
+    if (id === 'habitat') return s.state.systems.lifeSupport.isFaulted;
+    if (id === 'recycler') return s.state.systems.recycler.isFaulted;
+    if (id === 'greenhouse') return s.state.systems.greenhouse.isFaulted;
+    if (id === 'comms') return s.state.systems.comms.isFaulted;
+    if (id === 'rover_bay') return s.state.rover.isFaulted;
+    return false;
+  });
+
+  const isAdvisoryActive = useGameStore((s) =>
+    id === 'shelter' ? !!(s.state.radiationAdvisory && !s.state.radiationAdvisory.resolved) : false
+  );
+
+  const greenhouseBeds = useGameStore((s) => (id === 'greenhouse' ? s.state.greenhouseBeds : null));
 
   let statusColor = '#22c55e'; // Green
   if (isFaulted || condition < 25) {
@@ -83,9 +86,6 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name }) => {
   } else if (condition < 50) {
     statusColor = '#eab308'; // Yellow
   }
-
-  const isAdvisoryActive =
-    id === 'shelter' && state.radiationAdvisory && !state.radiationAdvisory.resolved;
 
   if (isAdvisoryActive) {
     statusColor = '#f59e0b';
@@ -197,23 +197,23 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name }) => {
               <boxGeometry args={[1.4, 0.3, 2.0]} />
               <meshStandardMaterial color="#78350f" />
             </mesh>
-            {state.greenhouseBeds.bed1.cropType && (
+            {greenhouseBeds?.bed1.cropType && (
               <mesh
                 position={[
                   0,
-                  0.2 + (state.greenhouseBeds.bed1.daysPlanted / 14) * 0.4,
+                  0.2 + (greenhouseBeds.bed1.daysPlanted / 14) * 0.4,
                   0,
                 ]}
                 scale={[
                   1,
-                  Math.max(0.2, state.greenhouseBeds.bed1.daysPlanted / 8),
+                  Math.max(0.2, greenhouseBeds.bed1.daysPlanted / 8),
                   1,
                 ]}
               >
                 <sphereGeometry args={[0.5, 8, 8]} />
                 <meshStandardMaterial
                   color={
-                    state.greenhouseBeds.bed1.stage === 'ready'
+                    greenhouseBeds.bed1.stage === 'ready'
                       ? '#4ade80'
                       : '#15803d'
                   }
@@ -227,26 +227,26 @@ export const BuildingMesh: React.FC<BuildingProps> = ({ id, name }) => {
             <mesh castShadow>
               <boxGeometry args={[1.4, 0.3, 2.0]} />
               <meshStandardMaterial
-                color={state.greenhouseBeds.bed2.unlocked ? '#78350f' : '#475569'}
+                color={greenhouseBeds?.bed2.unlocked ? '#78350f' : '#475569'}
               />
             </mesh>
-            {state.greenhouseBeds.bed2.cropType && (
+            {greenhouseBeds?.bed2.cropType && (
               <mesh
                 position={[
                   0,
-                  0.2 + (state.greenhouseBeds.bed2.daysPlanted / 14) * 0.4,
+                  0.2 + (greenhouseBeds.bed2.daysPlanted / 14) * 0.4,
                   0,
                 ]}
                 scale={[
                   1,
-                  Math.max(0.2, state.greenhouseBeds.bed2.daysPlanted / 8),
+                  Math.max(0.2, greenhouseBeds.bed2.daysPlanted / 8),
                   1,
                 ]}
               >
                 <sphereGeometry args={[0.5, 8, 8]} />
                 <meshStandardMaterial
                   color={
-                    state.greenhouseBeds.bed2.stage === 'ready'
+                    greenhouseBeds.bed2.stage === 'ready'
                       ? '#4ade80'
                       : '#15803d'
                   }

@@ -11,7 +11,7 @@
 
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
-import { getTerrainHeight, getTerrainSample, LUNAR_CRATERS, BASE_OBSTACLES } from './Physics/TerrainHeight.ts';
+import { getTerrainHeight, getTerrainZone, LUNAR_CRATERS, BASE_OBSTACLES } from './Physics/TerrainHeight.ts';
 
 // Generate procedural 512x512 regolith granular micro-detail bump & texture
 function createRegolithTextures(): { albedo: THREE.CanvasTexture; bump: THREE.CanvasTexture } {
@@ -124,6 +124,8 @@ export const Terrain: React.FC = () => {
     const volatileIceFrostColor = new THREE.Color('#9bb0c4'); // Subtle icy frost (silvery grey-blue, NOT neon)
     const mineralOreColor = new THREE.Color('#414954'); // Dark basaltic ilmenite / titanium
 
+    const tempColor = new THREE.Color();
+
     for (let i = 0; i < pos.count; i++) {
       const x = pos.getX(i);
       const z = pos.getZ(i);
@@ -132,26 +134,26 @@ export const Terrain: React.FC = () => {
       const y = getTerrainHeight(x, z);
       pos.setY(i, y);
 
-      const sample = getTerrainSample(x, z);
-      const vertexColor = baseRegolithColor.clone();
+      const zone = getTerrainZone(x, z);
+      tempColor.copy(baseRegolithColor);
 
       // Realistic Geological Zone Tone Mapping
-      if (sample.zone === 'Water Ice Deposit Zone') {
+      if (zone === 'Water Ice Deposit Zone') {
         // Cold polar permafrost frost sheen in permanently shadowed crater
         const iceFactor = Math.min(1.0, Math.max(0, -y / 3.0));
-        vertexColor.lerp(volatileIceFrostColor, iceFactor * 0.55);
-      } else if (sample.zone === 'Mineral Deposit Zone') {
+        tempColor.lerp(volatileIceFrostColor, iceFactor * 0.55);
+      } else if (zone === 'Mineral Deposit Zone') {
         // Basaltic mare minerals
-        vertexColor.lerp(mineralOreColor, 0.45);
+        tempColor.lerp(mineralOreColor, 0.45);
       } else if (y < -2.2) {
         // Shadowed deep crater basins
-        vertexColor.lerp(craterDeepShadowColor, 0.65);
+        tempColor.lerp(craterDeepShadowColor, 0.65);
       } else if (y > 1.0) {
         // Highland ejecta ridges catching sunlight
-        vertexColor.lerp(highlandAnorthositeColor, 0.45);
+        tempColor.lerp(highlandAnorthositeColor, 0.45);
       }
 
-      colors.push(vertexColor.r, vertexColor.g, vertexColor.b);
+      colors.push(tempColor.r, tempColor.g, tempColor.b);
     }
 
     geo.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));

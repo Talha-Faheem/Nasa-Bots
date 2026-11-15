@@ -7,6 +7,7 @@
 
 import { ResourceDeposit, GameState, CrewMember } from '../types.ts';
 import { getTerrainHeight } from '../../game3d/Physics/TerrainHeight.ts';
+import { cloneGameState } from '../clone.ts';
 
 export function createInitialDeposits(): Record<string, ResourceDeposit> {
   const depositList: Omit<ResourceDeposit, 'elevation'>[] = [
@@ -159,7 +160,7 @@ export function mineDeposit(
     return { nextState: state, extracted: 0, success: false };
   }
 
-  const nextState = JSON.parse(JSON.stringify(state)) as GameState;
+  const nextState = cloneGameState(state);
   const isGeologist = crewId === 'daniel';
   const yieldBonus = isGeologist ? 1.3 : 1.0;
 
@@ -225,7 +226,7 @@ export function processMaterials(
   processType: 'ice_to_water' | 'regolith_to_blocks' | 'ore_to_metal' | 'silicon_to_cells',
   batches = 1
 ): { nextState: GameState; success: boolean; message: string } {
-  const nextState = JSON.parse(JSON.stringify(state)) as GameState;
+  const nextState = cloneGameState(state);
   const r = nextState.resources;
 
   switch (processType) {

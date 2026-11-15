@@ -148,11 +148,13 @@ export const BUILDING_FOOTPRINTS: Record<BuildingId, BuildingFootprint> = {
   },
 };
 
+export const BUILDING_FOOTPRINT_LIST: BuildingFootprint[] = Object.values(BUILDING_FOOTPRINTS);
+
 /**
  * Checks if a point (x, z) lies inside any building footprint (uninflated).
  */
 export function isInsideAnyBuildingFootprint(x: number, z: number): boolean {
-  for (const fp of Object.values(BUILDING_FOOTPRINTS)) {
+  for (const fp of BUILDING_FOOTPRINT_LIST) {
     if (fp.type === 'circle') {
       const dist = Math.hypot(x - fp.center.x, z - fp.center.z);
       if (dist <= (fp.radius || 3.0)) return true;
@@ -176,7 +178,7 @@ export function isInsideAnyBuildingFootprint(x: number, z: number): boolean {
  * Checks if a point (x, z) lies inside an inflated building obstacle.
  */
 export function isInsideInflatedObstacle(x: number, z: number, inflation = INFLATION): boolean {
-  for (const fp of Object.values(BUILDING_FOOTPRINTS)) {
+  for (const fp of BUILDING_FOOTPRINT_LIST) {
     if (fp.type === 'circle') {
       const dist = Math.hypot(x - fp.center.x, z - fp.center.z);
       if (dist <= (fp.radius || 3.0) + inflation) return true;
@@ -209,7 +211,7 @@ export function resolveKinematicCollision(
   let collided = false;
   let collNormal: { x: number; z: number } | undefined;
 
-  for (const fp of Object.values(BUILDING_FOOTPRINTS)) {
+  for (const fp of BUILDING_FOOTPRINT_LIST) {
     if (fp.type === 'circle') {
       const minDistance = (fp.radius || 3.0) + radius;
       const dx = resX - fp.center.x;
@@ -515,7 +517,7 @@ export function validateBuildingPlacement(
 ): { valid: boolean; reason?: string } {
   const minCorridorWidth = 1.5;
 
-  for (const fp of Object.values(BUILDING_FOOTPRINTS)) {
+  for (const fp of BUILDING_FOOTPRINT_LIST) {
     const dx = Math.abs(center.x - fp.center.x);
     const dz = Math.abs(center.z - fp.center.z);
 
@@ -561,7 +563,7 @@ export function resolveCameraCollision(
   }
 
   // 2. Obstacle collision
-  for (const fp of Object.values(BUILDING_FOOTPRINTS)) {
+  for (const fp of BUILDING_FOOTPRINT_LIST) {
     const d = Math.hypot(cx - fp.center.x, cz - fp.center.z);
     const safeR = (fp.radius || 3.0) + minDistance;
     if (d < safeR && d > 0.001) {

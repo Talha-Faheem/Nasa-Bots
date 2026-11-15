@@ -10,7 +10,7 @@
  * - Smooth camera mode switcher and one-click/hotkey [ESC] exit.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useGameStore } from '../store/store.ts';
 import { BUILDING_FOOTPRINTS } from '../game3d/Physics/NavigationMesh.ts';
 import {
@@ -30,23 +30,13 @@ export const FpvHelmetHud: React.FC = () => {
   const fpvHelmetHudVisible = useGameStore((s) => s.fpvHelmetHudVisible);
   const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
   const state = useGameStore((s) => s.state);
-  const playerPos = useGameStore((s) => s.astronautPositions[activePlayerCrew]);
+  const rotation = useGameStore((s) => s.astronautPositions[activePlayerCrew]?.rotation ?? 0);
+  const nearbyBuilding = useGameStore((s) => s.nearbyBuilding);
   const cycleCameraMode = useGameStore((s) => s.cycleCameraMode);
   const setFpvControlMode = useGameStore((s) => s.setFpvControlMode);
   const setFpvHelmetHudVisible = useGameStore((s) => s.setFpvHelmetHudVisible);
   const setActiveNavTab = useGameStore((s) => s.setActiveNavTab);
   const openTaskMenu = useGameStore((s) => s.openTaskMenu);
-
-  const [breathPhase, setBreathPhase] = useState(0);
-
-  // Animate gentle breath fogging cycle (approx 14 breaths per min)
-  useEffect(() => {
-    if (cameraMode !== 'first_person') return;
-    const interval = setInterval(() => {
-      setBreathPhase((prev) => (prev + 0.1) % (Math.PI * 2));
-    }, 50);
-    return () => clearInterval(interval);
-  }, [cameraMode]);
 
   // Keyboard shortcut listener for FPV hotkeys:
   // - V: cycle camera mode
@@ -69,23 +59,16 @@ export const FpvHelmetHud: React.FC = () => {
         setActiveNavTab('astronauts');
         if (document.exitPointerLock) document.exitPointerLock();
       } else if (e.key === 'e' || e.key === 'E') {
-        // Trigger interaction with closest building if within range
-        if (playerPos) {
-          for (const fp of Object.values(BUILDING_FOOTPRINTS)) {
-            const dist = Math.hypot(playerPos.x - fp.center.x, playerPos.z - fp.center.z);
-            if (dist <= 5.0) {
-              openTaskMenu(fp.id);
-              if (document.exitPointerLock) document.exitPointerLock();
-              break;
-            }
-          }
+        if (nearbyBuilding) {
+          openTaskMenu(nearbyBuilding);
+          if (document.exitPointerLock) document.exitPointerLock();
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [cameraMode, fpvHelmetHudVisible, setFpvHelmetHudVisible, setActiveNavTab, openTaskMenu, playerPos]);
+  }, [cameraMode, fpvHelmetHudVisible, setFpvHelmetHudVisible, setActiveNavTab, openTaskMenu, nearbyBuilding]);
 
   if (cameraMode !== 'first_person' || !fpvHelmetHudVisible) return null;
 
@@ -93,11 +76,9 @@ export const FpvHelmetHud: React.FC = () => {
   const suitOxygen = Math.min(100, Math.max(0, Math.round(state.resources.oxygen)));
   const suitBattery = Math.min(100, Math.max(0, Math.round(state.resources.battery)));
   const radiationDose = Math.round(crew.exposure);
-  const breathFogOpacity = 0.07 + Math.max(0, Math.sin(breathPhase)) * 0.11;
 
   // Calculate compass heading & cardinal direction from astronaut rotation
-  const rotRad = playerPos?.rotation ?? 0;
-  const rawDeg = ((-rotRad * 180) / Math.PI) % 360;
+  const rawDeg = ((-rotation * 180) / Math.PI) % 360;
   const headingDeg = (Math.round(rawDeg) + 360) % 360;
 
   const getCardinal = (deg: number) => {
@@ -112,22 +93,23 @@ export const FpvHelmetHud: React.FC = () => {
   };
   const cardinal = getCardinal(headingDeg);
 
-  // Proximity check for interaction prompt
-  let nearbyPrompt = '';
-  let nearbyDist = 0;
-  if (playerPos) {
-    for (const fp of Object.values(BUILDING_FOOTPRINTS)) {
-      const dist = Math.hypot(playerPos.x - fp.center.x, playerPos.z - fp.center.z);
-      if (dist <= 5.0) {
-        nearbyPrompt = `PRESS [E] TO ACCESS ${fp.name.toUpperCase()}`;
-        nearbyDist = Math.round(dist * 10) / 10;
-        break;
-      }
-    }
-  }
+  // Proximity prompt from authoritative nearbyBuilding state
+  const fp = nearbyBuilding ? BUILDING_FOOTPRINTS[nearbyBuilding] : null;
+  const nearbyPrompt = fp ? `PRESS [E] TO ACCESS ${fp.name.toUpperCase()}` : '';
+  const player = useGameStore.getState().astronautPositions[activePlayerCrew];
+  const nearbyDist =
+    player && fp
+      ? Math.round(Math.hypot(player.x - fp.center.x, player.z - fp.center.z) * 10) / 10
+      : 0;
 
   return (
     <div className="fixed inset-0 pointer-events-none select-none z-30 font-mono text-[#E6F1F5] overflow-hidden">
+      <style>{`
+        @keyframes breathFogPulse {
+          0%, 100% { opacity: 0.07; }
+          50% { opacity: 0.18; }
+        }
+      `}</style>
       {/* 1. Curved Helmet Visor Vignette (Glass Border Overlay) */}
       <div
         className="absolute inset-0"
@@ -137,11 +119,11 @@ export const FpvHelmetHud: React.FC = () => {
         }}
       />
 
-      {/* 2. Soft Visor Breath Fogging at bottom edges */}
+      {/* 2. Soft Visor Breath Fogging at bottom edges (pure GPU CSS animation) */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-44 transition-opacity duration-300"
+        className="absolute bottom-0 left-0 right-0 h-44 pointer-events-none"
         style={{
-          opacity: breathFogOpacity,
+          animation: 'breathFogPulse 4.3s infinite ease-in-out',
           background:
             'radial-gradient(ellipse at 50% 120%, rgba(210, 235, 255, 0.45) 0%, rgba(190, 225, 250, 0.2) 45%, transparent 75%)',
         }}

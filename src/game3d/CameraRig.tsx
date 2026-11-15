@@ -18,13 +18,15 @@ import { useGameStore } from '../store/store.ts';
 import { resolveCameraCollision } from './Physics/NavigationMesh.ts';
 import { getTerrainHeight } from './Physics/TerrainHeight.ts';
 
+const _desiredCamPos = new THREE.Vector3();
+const _safeCamVec = new THREE.Vector3();
+
 export const CameraRig: React.FC = () => {
   const controlsRef = useRef<any>(null);
   const { camera, gl } = useThree();
 
   const cameraMode = useGameStore((s) => s.cameraMode);
   const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
-  const astronautPositions = useGameStore((s) => s.astronautPositions);
   const reducedMotion = useGameStore((s) => s.reducedMotion);
   const cameraFov = useGameStore((s) => s.cameraFov);
   const mouseSensitivity = useGameStore((s) => s.mouseSensitivity);
@@ -115,7 +117,7 @@ export const CameraRig: React.FC = () => {
   }, []);
 
   useFrame((state, delta) => {
-    const astronaut = astronautPositions[activePlayerCrew] || { x: 0, z: 0, rotation: 0 };
+    const astronaut = useGameStore.getState().astronautPositions[activePlayerCrew] || { x: 0, z: 0, rotation: 0 };
     const groundY = astronaut.y ?? getTerrainHeight(astronaut.x, astronaut.z);
 
     if (cameraMode === 'commander') {
@@ -132,7 +134,7 @@ export const CameraRig: React.FC = () => {
     } else if (cameraMode === 'follow') {
       // 2. Follow View: Third-person chase camera positioned behind astronaut
       const rot = astronaut.rotation;
-      const desiredPos = new THREE.Vector3(
+      _desiredCamPos.set(
         astronaut.x - Math.sin(rot) * 3.4,
         groundY + 1.8,
         astronaut.z - Math.cos(rot) * 3.4
@@ -141,10 +143,11 @@ export const CameraRig: React.FC = () => {
       // Camera collision resolution
       const safeCamPos = resolveCameraCollision(
         { x: astronaut.x, y: groundY + 1.5, z: astronaut.z },
-        desiredPos
+        _desiredCamPos
       );
 
-      camera.position.lerp(new THREE.Vector3(safeCamPos.x, safeCamPos.y, safeCamPos.z), 0.15);
+      _safeCamVec.set(safeCamPos.x, safeCamPos.y, safeCamPos.z);
+      camera.position.lerp(_safeCamVec, 0.15);
       camera.lookAt(astronaut.x, groundY + 1.4, astronaut.z);
     } else if (cameraMode === 'first_person') {
       // 3. First-Person View (FPV): Eye-level helmet camera (1.6m above feet)
@@ -165,13 +168,15 @@ export const CameraRig: React.FC = () => {
       const euler = new THREE.Euler(pitch.current, yaw.current, 0, 'YXZ');
       camera.quaternion.setFromEuler(euler);
 
-      // Keep astronaut model heading synchronized with helmet yaw
-      useGameStore.getState().updateAstronautPosition(activePlayerCrew, {
-        x: astronaut.x,
-        y: groundY,
-        z: astronaut.z,
-        rotation: yaw.current,
-      });
+      // Keep astronaut model heading synchronized with helmet yaw if rotated
+      if (Math.abs(astronaut.rotation - yaw.current) > 0.005) {
+        useGameStore.getState().updateAstronautPosition(activePlayerCrew, {
+          x: astronaut.x,
+          y: groundY,
+          z: astronaut.z,
+          rotation: yaw.current,
+        });
+      }
     }
   });
 

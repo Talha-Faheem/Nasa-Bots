@@ -50,7 +50,7 @@ const ModelInner: React.FC<GLTFModelProps> = ({
   );
 };
 
-export const GLTFModel: React.FC<GLTFModelProps> = (props) => {
+export const GLTFModel: React.FC<GLTFModelProps> = React.memo((props) => {
   const {
     fallbackColor = '#25C5F4',
     fallbackGeometry = 'box',
@@ -88,7 +88,7 @@ export const GLTFModel: React.FC<GLTFModelProps> = (props) => {
       <ModelInner {...props} />
     </Suspense>
   );
-};
+});
 
 // Preload high-priority models to eliminate pop-in
 export function preloadColonyAssets() {

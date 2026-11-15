@@ -20,21 +20,18 @@ interface SingleDepositProps {
 
 const SingleDepositMesh: React.FC<SingleDepositProps> = ({ deposit }) => {
   const [hovered, setHovered] = useState(false);
+  const [isNearby, setIsNearby] = useState(false);
+  const isNearbyRef = useRef(false);
   const beaconRef = useRef<THREE.Group>(null);
   const pulseRef = useRef<THREE.Mesh>(null);
 
   const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
-  const playerPos = useGameStore((s) => s.astronautPositions[s.activePlayerCrew]);
   const dispatch = useGameStore((s) => s.dispatch);
   const openLearnCard = useGameStore((s) => s.openLearnCard);
 
   const posX = deposit.position.x;
   const posZ = deposit.position.z;
   const posY = deposit.elevation ?? getTerrainHeight(posX, posZ);
-
-  // Measure distance from active astronaut to deposit
-  const distToPlayer = playerPos ? Math.hypot(playerPos.x - posX, playerPos.z - posZ) : 999;
-  const isNearby = distToPlayer <= 5.5;
 
   useFrame((state, delta) => {
     // Gentle rotation of holographic waypoint beacon
@@ -45,6 +42,17 @@ const SingleDepositMesh: React.FC<SingleDepositProps> = ({ deposit }) => {
     if (pulseRef.current) {
       const s = 1 + Math.sin(state.clock.getElapsedTime() * 3) * 0.08;
       pulseRef.current.scale.set(s, s, s);
+    }
+
+    // High-performance proximity check: only trigger React re-render when crossing threshold
+    const player = useGameStore.getState().astronautPositions[activePlayerCrew];
+    if (player) {
+      const distSq = (player.x - posX) ** 2 + (player.z - posZ) ** 2;
+      const nearby = distSq <= 30.25; // 5.5m squared
+      if (nearby !== isNearbyRef.current) {
+        isNearbyRef.current = nearby;
+        setIsNearby(nearby);
+      }
     }
   });
 

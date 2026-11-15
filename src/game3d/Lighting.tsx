@@ -9,6 +9,9 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useGameStore } from '../store/store.ts';
 
+const COLOR_NORMAL = new THREE.Color('#fff7e6');
+const COLOR_ADVISORY = new THREE.Color('#ffb84d');
+
 export const Lighting: React.FC = () => {
   const sunlightFactor = useGameStore((s) => s.state.powerBreakdown.sunlightFactor);
   const radiationAdvisory = useGameStore((s) => s.state.radiationAdvisory);
@@ -22,13 +25,13 @@ export const Lighting: React.FC = () => {
 
     // Normal solar light intensity follows site sunlight factor
     let baseIntensity = 2.4 * sunlightFactor;
-    let sunColor = new THREE.Color('#fff7e6');
+    let sunColor = COLOR_NORMAL;
 
     // Calm space-weather visuals: gentle amber warmth and subtle pulse
     if (radiationAdvisory && !radiationAdvisory.resolved) {
       const pulse = Math.sin(stateFrame.clock.getElapsedTime() * 2) * 0.15;
       baseIntensity = (2.0 + pulse) * sunlightFactor;
-      sunColor = new THREE.Color('#ffb84d');
+      sunColor = COLOR_ADVISORY;
     }
 
     sunRef.current.intensity = baseIntensity;

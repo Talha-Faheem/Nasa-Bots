@@ -116,22 +116,7 @@ export function getTerrainSample(x: number, z: number): TerrainSample {
   const isWalkable = slopeDeg <= 35;
 
   // Zone classification
-  let zone: TerrainSample['zone'] = 'Lunar Regolith Plains';
-  const distCenter = Math.hypot(x, z);
-
-  if (distCenter <= 22) {
-    zone = 'Base Construction Zone';
-  } else if (Math.hypot(x - (-10), z - 35) <= 16) {
-    zone = 'Water Ice Deposit Zone';
-  } else if (Math.hypot(x - (-25), z - (-20)) <= 15) {
-    zone = 'Crater Exploration Zone';
-  } else if (Math.hypot(x - 30, z - (-15)) <= 18) {
-    zone = 'Mineral Deposit Zone';
-  } else if (Math.hypot(x - 28, z - 25) <= 14 || Math.hypot(x - 22, z - (-16)) <= 8) {
-    zone = 'Rocky Terrain Zone';
-  } else if (Math.hypot(x - (-35), z - 15) <= 20) {
-    zone = 'Scientific Research Zone';
-  }
+  const zone = getTerrainZone(x, z);
 
   return {
     height,
@@ -140,6 +125,27 @@ export function getTerrainSample(x: number, z: number): TerrainSample {
     isWalkable,
     zone,
   };
+}
+
+/**
+ * Fast zone classification based purely on planar (x, z) coordinates without height/normal calculations.
+ */
+export function getTerrainZone(x: number, z: number): TerrainSample['zone'] {
+  const distCenter = Math.hypot(x, z);
+  if (distCenter <= 22) {
+    return 'Base Construction Zone';
+  } else if (Math.hypot(x - (-10), z - 35) <= 16) {
+    return 'Water Ice Deposit Zone';
+  } else if (Math.hypot(x - (-25), z - (-20)) <= 15) {
+    return 'Crater Exploration Zone';
+  } else if (Math.hypot(x - 30, z - (-15)) <= 18) {
+    return 'Mineral Deposit Zone';
+  } else if (Math.hypot(x - 28, z - 25) <= 14 || Math.hypot(x - 22, z - (-16)) <= 8) {
+    return 'Rocky Terrain Zone';
+  } else if (Math.hypot(x - (-35), z - 15) <= 20) {
+    return 'Scientific Research Zone';
+  }
+  return 'Lunar Regolith Plains';
 }
 
 /**

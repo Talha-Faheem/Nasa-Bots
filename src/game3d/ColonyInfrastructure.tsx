@@ -9,7 +9,7 @@ import React from 'react';
 import { GLTFModel } from './ModelLoader.tsx';
 import { getTerrainHeight } from './Physics/TerrainHeight.ts';
 
-export const ColonyInfrastructure: React.FC = () => {
+export const ColonyInfrastructure: React.FC = React.memo(() => {
   return (
     <group>
       {/* 1. Artemis Landing Pad Complex (South of Base) */}
@@ -176,4 +176,4 @@ export const ColonyInfrastructure: React.FC = () => {
       </group>
     </group>
   );
-};
+});

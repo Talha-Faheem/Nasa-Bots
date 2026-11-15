@@ -37,6 +37,9 @@ import { ROVER_DESTINATIONS } from './rules/rover.ts';
 import { CONSTRUCTION_PROJECTS } from './rules/construction.ts';
 import { createInitialObjectives, createInitialAchievements } from './rules/objectives.ts';
 import { createInitialDeposits, scanDeposit, mineDeposit, processMaterials } from './rules/geology.ts';
+import { cloneCrew, cloneGameState } from './clone.ts';
+
+export { cloneCrew, cloneGameState };
 
 export function createInitialState(
   seed: number,
@@ -51,7 +54,7 @@ export function createInitialState(
   const startWater = difficulty === 'cadet' ? 90 : 80;
   const startFood = difficulty === 'cadet' ? 85 : 75;
 
-  const crew = JSON.parse(JSON.stringify(INITIAL_CREW)) as typeof INITIAL_CREW;
+  const crew = cloneCrew(INITIAL_CREW);
 
   const state: GameState = {
     mission: {
@@ -215,7 +218,7 @@ export class SimulationEngine {
    * Executes a command on the game state deterministically.
    */
   dispatch(state: GameState, command: Command): GameState {
-    const nextState = JSON.parse(JSON.stringify(state)) as GameState;
+    const nextState = cloneGameState(state);
     if (!nextState.commandLog) {
       nextState.commandLog = [];
     }
@@ -683,7 +686,7 @@ export class SimulationEngine {
       return state;
     }
 
-    const nextState = JSON.parse(JSON.stringify(state)) as GameState;
+    const nextState = cloneGameState(state);
     const mission = nextState.mission;
 
     // Check Stage updates: Stage 1 (Days 1-5), Stage 2 (Days 6-15), Stage 3 (Days 16-30)

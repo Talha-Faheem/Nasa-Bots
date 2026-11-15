@@ -14,6 +14,11 @@ import { eventBus } from '../../store/bus.ts';
 import { getTerrainHeight, getTerrainSample, resolveMovementCollisions } from '../Physics/TerrainHeight.ts';
 
 const CREW_LIST: CrewId[] = ['alex', 'sara', 'daniel', 'maya'];
+const _camForward = new THREE.Vector3();
+const _camRight = new THREE.Vector3();
+const _moveDir = new THREE.Vector3();
+const _WORLD_UP = new THREE.Vector3(0, 1, 0);
+const BUILDING_ENTRIES = Object.entries(BUILDING_COORDINATES) as [BuildingId, { x: number; z: number }][];
 
 export const PlayerController: React.FC = () => {
   const { camera } = useThree();
@@ -32,6 +37,7 @@ export const PlayerController: React.FC = () => {
   const keysPressed = useRef<{ [key: string]: boolean }>({});
   const currentPos = useRef(new THREE.Vector3(-2, 0, -1));
   const currentRotation = useRef(0);
+  const prevNearbyBuilding = useRef<BuildingId | null>(null);
 
   // Setup keyboard event listeners
   useEffect(() => {
@@ -119,32 +125,30 @@ export const PlayerController: React.FC = () => {
     if (activeModal !== 'none') return;
 
     // Camera planar vectors (ignoring pitch)
-    const camForward = new THREE.Vector3();
-    camera.getWorldDirection(camForward);
-    camForward.y = 0;
-    camForward.normalize();
+    camera.getWorldDirection(_camForward);
+    _camForward.y = 0;
+    _camForward.normalize();
 
-    const camRight = new THREE.Vector3();
-    camRight.crossVectors(camForward, new THREE.Vector3(0, 1, 0)).normalize();
+    _camRight.crossVectors(_camForward, _WORLD_UP).normalize();
 
     // Direction calculation
-    const moveDir = new THREE.Vector3(0, 0, 0);
-    if (keysPressed.current['w'] || keysPressed.current['arrowup']) moveDir.add(camForward);
-    if (keysPressed.current['s'] || keysPressed.current['arrowdown']) moveDir.sub(camForward);
-    if (keysPressed.current['d'] || keysPressed.current['arrowright']) moveDir.add(camRight);
-    if (keysPressed.current['a'] || keysPressed.current['arrowleft']) moveDir.sub(camRight);
+    _moveDir.set(0, 0, 0);
+    if (keysPressed.current['w'] || keysPressed.current['arrowup']) _moveDir.add(_camForward);
+    if (keysPressed.current['s'] || keysPressed.current['arrowdown']) _moveDir.sub(_camForward);
+    if (keysPressed.current['d'] || keysPressed.current['arrowright']) _moveDir.add(_camRight);
+    if (keysPressed.current['a'] || keysPressed.current['arrowleft']) _moveDir.sub(_camRight);
 
-    const isMoving = moveDir.lengthSq() > 0.001;
+    const isMoving = _moveDir.lengthSq() > 0.001;
 
     if (isMoving) {
-      moveDir.normalize();
+      _moveDir.normalize();
       const isSprinting = !!keysPressed.current['shift'];
       const speed = isSprinting ? 8.2 : 4.5; // units per second
 
       // Calculate tentative next step
       const stepDist = speed * delta;
-      const tentativeX = currentPos.current.x + moveDir.x * stepDist;
-      const tentativeZ = currentPos.current.z + moveDir.z * stepDist;
+      const tentativeX = currentPos.current.x + _moveDir.x * stepDist;
+      const tentativeZ = currentPos.current.z + _moveDir.z * stepDist;
 
       // 1. Terrain slope and walkability query
       const sample = getTerrainSample(tentativeX, tentativeZ);
@@ -152,12 +156,12 @@ export const PlayerController: React.FC = () => {
 
       // 2. Obstacle collision resolution (buildings, large boulders)
       const targetX = THREE.MathUtils.clamp(
-        currentPos.current.x + moveDir.x * stepDist * slopeFactor,
+        currentPos.current.x + _moveDir.x * stepDist * slopeFactor,
         -55,
         55
       );
       const targetZ = THREE.MathUtils.clamp(
-        currentPos.current.z + moveDir.z * stepDist * slopeFactor,
+        currentPos.current.z + _moveDir.z * stepDist * slopeFactor,
         -55,
         55
       );
@@ -172,7 +176,7 @@ export const PlayerController: React.FC = () => {
       currentPos.current.set(resolved.x, groundY, resolved.z);
 
       // Rotate toward movement direction smoothly
-      const targetAngle = Math.atan2(moveDir.x, moveDir.z);
+      const targetAngle = Math.atan2(_moveDir.x, _moveDir.z);
       currentRotation.current = THREE.MathUtils.lerp(currentRotation.current, targetAngle, 0.25);
 
       updateAstronautPosition(activePlayerCrew, {
@@ -187,15 +191,19 @@ export const PlayerController: React.FC = () => {
     let closestBuilding: BuildingId | null = null;
     let minDistance = Infinity;
 
-    for (const [bid, coords] of Object.entries(BUILDING_COORDINATES)) {
+    for (let i = 0; i < BUILDING_ENTRIES.length; i++) {
+      const [bid, coords] = BUILDING_ENTRIES[i];
       const dist = Math.hypot(coords.x - currentPos.current.x, coords.z - currentPos.current.z);
       if (dist <= 4.2 && dist < minDistance) {
         minDistance = dist;
-        closestBuilding = bid as BuildingId;
+        closestBuilding = bid;
       }
     }
 
-    setNearbyBuilding(closestBuilding);
+    if (closestBuilding !== prevNearbyBuilding.current) {
+      prevNearbyBuilding.current = closestBuilding;
+      setNearbyBuilding(closestBuilding);
+    }
   });
 
   return null;

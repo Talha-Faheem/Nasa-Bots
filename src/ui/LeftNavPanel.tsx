@@ -48,50 +48,16 @@ const NAV_ITEMS: { id: ActiveNavTab; label: string; icon: React.ComponentType<{ 
   { id: 'stats', label: 'Analytics', icon: BarChart3 },
 ];
 
-export const LeftNavPanel: React.FC = () => {
-  const activeNavTab = useGameStore((s) => s.activeNavTab);
+const LeftNavDrawer: React.FC<{ activeNavTab: ActiveNavTab }> = ({ activeNavTab }) => {
   const setActiveNavTab = useGameStore((s) => s.setActiveNavTab);
   const setSelectedEntity = useGameStore((s) => s.setSelectedEntity);
   const state = useGameStore((s) => s.state);
   const dispatch = useGameStore((s) => s.dispatch);
-
   const activePlayerCrew = useGameStore((s) => s.activePlayerCrew);
   const openLearnCard = useGameStore((s) => s.openLearnCard);
-  const toggleTab = (tab: ActiveNavTab) => {
-    setActiveNavTab(activeNavTab === tab ? null : tab);
-  };
 
   return (
-    <div className="absolute left-3 top-24 bottom-20 z-20 flex pointer-events-none select-none">
-      {/* Narrow Icon Rail */}
-      <div className="flex flex-col gap-1 p-1 bg-[#080F1B]/95 border border-[#26374D] rounded-xl shadow-xl backdrop-blur-md pointer-events-auto">
-        {NAV_ITEMS.map((item) => {
-          const isActive = activeNavTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => toggleTab(item.id)}
-              className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm transition-all cursor-pointer relative group ${
-                isActive
-                  ? 'bg-[#25C5F4] text-[#080F1B] font-bold shadow-[0_0_8px_rgba(37,197,244,0.3)]'
-                  : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152235]'
-              }`}
-              title={item.label}
-              aria-label={item.label}
-            >
-              <item.icon className="w-4 h-4" />
-              {/* Tooltip on hover */}
-              <span className="absolute left-full ml-2 px-2 py-1 rounded bg-[#101A29] text-[#F1F5F9] text-[10px] font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-[#26374D] shadow-xl pointer-events-none z-50">
-                {item.label}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Expandable Management Drawer */}
-      {activeNavTab && (
-        <div className="ml-2 w-84 bg-[#080F1B]/95 border border-[#26374D] rounded-xl shadow-2xl backdrop-blur-xl pointer-events-auto flex flex-col overflow-hidden animate-fadeIn text-[#F1F5F9]">
+    <div className="ml-2 w-84 bg-[#080F1B]/95 border border-[#26374D] rounded-xl shadow-2xl backdrop-blur-xl pointer-events-auto flex flex-col overflow-hidden animate-fadeIn text-[#F1F5F9]">
           {/* Drawer Header */}
           <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-[#26374D] bg-[#101A29]">
             <div className="flex items-center gap-2">
@@ -861,7 +827,47 @@ export const LeftNavPanel: React.FC = () => {
             )}
           </div>
         </div>
-      )}
+  );
+};
+
+export const LeftNavPanel: React.FC = () => {
+  const activeNavTab = useGameStore((s) => s.activeNavTab);
+  const setActiveNavTab = useGameStore((s) => s.setActiveNavTab);
+
+  const toggleTab = (tab: ActiveNavTab) => {
+    setActiveNavTab(activeNavTab === tab ? null : tab);
+  };
+
+  return (
+    <div className="absolute left-3 top-24 bottom-20 z-20 flex pointer-events-none select-none">
+      {/* Narrow Icon Rail */}
+      <div className="flex flex-col gap-1 p-1 bg-[#080F1B]/95 border border-[#26374D] rounded-xl shadow-xl backdrop-blur-md pointer-events-auto">
+        {NAV_ITEMS.map((item) => {
+          const isActive = activeNavTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => toggleTab(item.id)}
+              className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm transition-all cursor-pointer relative group ${
+                isActive
+                  ? 'bg-[#25C5F4] text-[#080F1B] font-bold shadow-[0_0_8px_rgba(37,197,244,0.3)]'
+                  : 'text-[#94A3B8] hover:text-[#F1F5F9] hover:bg-[#152235]'
+              }`}
+              title={item.label}
+              aria-label={item.label}
+            >
+              <item.icon className="w-4 h-4" />
+              {/* Tooltip on hover */}
+              <span className="absolute left-full ml-2 px-2 py-1 rounded bg-[#101A29] text-[#F1F5F9] text-[10px] font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity border border-[#26374D] shadow-xl pointer-events-none z-50">
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Expandable Management Drawer */}
+      {activeNavTab && <LeftNavDrawer activeNavTab={activeNavTab} />}
     </div>
   );
 };

@@ -12,6 +12,10 @@ import { eventBus } from '../store/bus.ts';
 import { GLTFModel } from './ModelLoader.tsx';
 import { getTerrainHeight, getTerrainSample } from './Physics/TerrainHeight.ts';
 
+const HOME_POS = new THREE.Vector3(0, 0.4, -16);
+const SAMPLE_POS = new THREE.Vector3(26, 0.4, -28);
+const _currentPos = new THREE.Vector3();
+
 export const Rover3D: React.FC = () => {
   const rover = useGameStore((s) => s.state.rover);
   const totalTicks = useGameStore((s) => s.state.mission.totalTicks);
@@ -19,11 +23,6 @@ export const Rover3D: React.FC = () => {
   const roverRef = useRef<THREE.Group>(null);
   const wheelsRef = useRef<THREE.Mesh[]>([]);
   const radarRef = useRef<THREE.Mesh>(null);
-
-  // Home location: Rover Bay at (0, -16)
-  // Sample Site: marked crater point at (26, -28)
-  const homePos = new THREE.Vector3(0, 0.4, -16);
-  const samplePos = new THREE.Vector3(26, 0.4, -28);
 
   useFrame((state) => {
     if (!roverRef.current) return;
@@ -33,23 +32,22 @@ export const Rover3D: React.FC = () => {
       const ticksLeft = Math.max(0, rover.returnTick - totalTicks);
       const progress = 1 - ticksLeft / 6; // 0 to 1
 
-      let currentPos: THREE.Vector3;
       if (progress < 0.5) {
-        currentPos = homePos.clone().lerp(samplePos, progress * 2);
-        roverRef.current.lookAt(samplePos);
+        _currentPos.lerpVectors(HOME_POS, SAMPLE_POS, progress * 2);
+        roverRef.current.lookAt(SAMPLE_POS);
       } else {
-        currentPos = samplePos.clone().lerp(homePos, (progress - 0.5) * 2);
-        roverRef.current.lookAt(homePos);
+        _currentPos.lerpVectors(SAMPLE_POS, HOME_POS, (progress - 0.5) * 2);
+        roverRef.current.lookAt(HOME_POS);
       }
 
       // Precise Ground Surface Elevation & Suspension Bobbing
-      const groundY = getTerrainHeight(currentPos.x, currentPos.z);
+      const groundY = getTerrainHeight(_currentPos.x, _currentPos.z);
       const bob = Math.sin(state.clock.getElapsedTime() * 10) * 0.04;
-      currentPos.y = groundY + 0.28 + Math.abs(bob);
-      roverRef.current.position.copy(currentPos);
+      _currentPos.y = groundY + 0.28 + Math.abs(bob);
+      roverRef.current.position.copy(_currentPos);
 
       // Pitch and roll rover to align with terrain slope
-      const sample = getTerrainSample(currentPos.x, currentPos.z);
+      const sample = getTerrainSample(_currentPos.x, _currentPos.z);
       roverRef.current.rotation.x = sample.normal.z * 0.3;
       roverRef.current.rotation.z = -sample.normal.x * 0.3;
 
@@ -59,7 +57,7 @@ export const Rover3D: React.FC = () => {
         if (w) w.rotation.x = wheelSpin;
       }
     } else {
-      roverRef.current.position.copy(homePos);
+      roverRef.current.position.copy(HOME_POS);
       roverRef.current.rotation.set(0, 0, 0);
     }
 
